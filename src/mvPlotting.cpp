@@ -362,6 +362,30 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
 		}
 		auto context = ImPlot::GetCurrentContext();
 
+		ImGuiIO& IO = ImGui::GetIO();
+		// Note: we can't use `config.querying` here because in the frame when
+		// the query modifier gets pressed, `querying` is still false but we already
+		// need to disable `OverrideMod`.
+		if (ImHasFlag(IO.KeyMods, ImGuiMod_Ctrl) && (ImGui::IsMouseDown(ImPlot::GetInputMap().Select) || ImGui::IsMouseReleased(ImPlot::GetInputMap().Select)))
+		{
+			// Preventing ImPlot from getting stuck on selection
+			ImPlot::GetInputMap().OverrideMod = ImGuiMod_None;
+		}
+		else
+			ImPlot::GetInputMap().OverrideMod = config.override_mod;
+
+		if (config.querying && ImGui::IsMouseReleased(ImPlot::GetInputMap().Select))
+		{
+			config.rects.push_back(config.query_rect);
+			config.querying = false;
+			// Prevent ImPlot from handling mouse release on its own.
+			ImPlot::GetInputMap().OverrideMod = ImGuiMod_Ctrl;
+			// Note: this will lock the setup and might therefore skip changes
+			// to the legend, drag points, and lines in this frame.  Nothing we
+			// can do about that, really.
+			ImPlot::CancelPlotSelection();
+		}
+
 		// legend, drag point and lines
 		for (auto& child : item.childslots[0]) // Using "ImPlot::GetPlotPos()" here trigger an assert
 			child->draw(drawlist, context->CurrentPlot->PlotRect.Min.x, context->CurrentPlot->PlotRect.Min.y);
@@ -408,13 +432,10 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
 			}
 		}
 
-		if (ImPlot::IsPlotSelected()) {
-            ImPlotRect select = ImPlot::GetPlotSelection();
-            if (ImGui::IsMouseClicked(ImPlot::GetInputMap().SelectCancel)) {
-                ImPlot::CancelPlotSelection();
-                config.rects.push_back(select);
-            }
-        }
+		config.querying = ImHasFlag(IO.KeyMods, ImGuiMod_Ctrl) && ImPlot::IsPlotSelected();
+		if (config.querying)
+			config.query_rect = ImPlot::GetPlotSelection();
+
         for (int i = 0; i < config.rects.size(); ++i) {
 			// TODO: Implement flags
             ImPlot::DragRect(i,&config.rects[i].X.Min,&config.rects[i].Y.Min,&config.rects[i].X.Max,&config.rects[i].Y.Max,ImVec4(1,0,1,1));

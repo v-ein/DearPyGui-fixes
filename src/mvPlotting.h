@@ -415,6 +415,8 @@ struct mvPlotConfig
     ImPlotColormap                              _colormap = ImPlotColormap_Deep;
     bool                                        _equalAspectRatios = false;
     std::vector<ImPlotRect>                     rects = std::vector<ImPlotRect>();
+    bool                                        querying = false;
+    ImPlotRect                                  query_rect;
     bool                                        _fitDirty = false;
     bool                                        _axisfitDirty[ImAxis_COUNT] = { false, false, false, false, false, false }; 
     ImPlotInputMap                              _originalMap = ImPlotInputMap(); // custom input mapping
