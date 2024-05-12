@@ -3242,7 +3242,6 @@ DearPyGui::GetEntityParser(mvAppItemType type)
         args.push_back({ mvPyDataType::Bool, "indent_enable", mvArgType::KEYWORD_ARG, "False", "Use current Indent value when entering cell (default for column 0)." });
         args.push_back({ mvPyDataType::Bool, "indent_disable", mvArgType::KEYWORD_ARG, "False", "Ignore current Indent value when entering cell (default for columns > 0). Indentation changes _within_ the cell will still be honored." });
         args.push_back({ mvPyDataType::Bool, "angled_header", mvArgType::KEYWORD_ARG, "False", "TableHeadersRow() will submit an angled header row for this column. Note this will add an extra row." });
-        args.push_back({ mvPyDataType::Bool, "disabled", mvArgType::KEYWORD_ARG, "False", "Default as a hidden/disabled column." });
         args.push_back({ mvPyDataType::Bool, "no_header_label", mvArgType::KEYWORD_ARG, "False", "TableHeadersRow() will not submit horizontal label for this column. Convenient for some small columns. Name will still appear in context menu or in angled headers." });
 
         setup.about = "Adds a table column.";

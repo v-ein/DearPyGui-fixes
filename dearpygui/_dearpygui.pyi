@@ -558,7 +558,7 @@ def add_table_cell(*, label: str ='', user_data: Any ='', use_internal_label: bo
 	"""Adds a table."""
 	...
 
-def add_table_column(*, label: str ='', user_data: Any ='', use_internal_label: bool ='', tag: Union[int, str] ='', width: int ='', parent: Union[int, str] ='', before: Union[int, str] ='', show: bool ='', enabled: bool ='', init_width_or_weight: float ='', default_hide: bool ='', default_sort: bool ='', width_stretch: bool ='', width_fixed: bool ='', no_resize: bool ='', no_reorder: bool ='', no_hide: bool ='', no_clip: bool ='', no_sort: bool ='', no_sort_ascending: bool ='', no_sort_descending: bool ='', no_header_width: bool ='', prefer_sort_ascending: bool ='', prefer_sort_descending: bool ='', indent_enable: bool ='', indent_disable: bool ='', angled_header: bool ='', disabled: bool ='', no_header_label: bool ='') -> Union[int, str]:
+def add_table_column(*, label: str ='', user_data: Any ='', use_internal_label: bool ='', tag: Union[int, str] ='', width: int ='', parent: Union[int, str] ='', before: Union[int, str] ='', show: bool ='', enabled: bool ='', init_width_or_weight: float ='', default_hide: bool ='', default_sort: bool ='', width_stretch: bool ='', width_fixed: bool ='', no_resize: bool ='', no_reorder: bool ='', no_hide: bool ='', no_clip: bool ='', no_sort: bool ='', no_sort_ascending: bool ='', no_sort_descending: bool ='', no_header_width: bool ='', prefer_sort_ascending: bool ='', prefer_sort_descending: bool ='', indent_enable: bool ='', indent_disable: bool ='', angled_header: bool ='', no_header_label: bool ='') -> Union[int, str]:
 	"""Adds a table column."""
 	...
 

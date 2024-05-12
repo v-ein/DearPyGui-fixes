@@ -6489,7 +6489,6 @@ def add_table_column(**kwargs):
 		indent_enable (bool, optional): Use current Indent value when entering cell (default for column 0).
 		indent_disable (bool, optional): Ignore current Indent value when entering cell (default for columns > 0). Indentation changes _within_ the cell will still be honored.
 		angled_header (bool, optional): TableHeadersRow() will submit an angled header row for this column. Note this will add an extra row.
-		disabled (bool, optional): Default as a hidden/disabled column.
 		no_header_label (bool, optional): TableHeadersRow() will not submit horizontal label for this column. Convenient for some small columns. Name will still appear in context menu or in angled headers.
 		id (Union[int, str], optional): (deprecated)
 	Returns:
