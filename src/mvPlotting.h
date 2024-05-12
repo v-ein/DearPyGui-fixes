@@ -400,6 +400,7 @@ struct mvPlotConfig
     ImGuiMouseButton             select;            // RMB    begins box selection when pressed and confirms selection when released
     ImGuiKey                     select_mod;        // none   optional modifier that must be held for box selection
     ImGuiMouseButton             select_cancel;     // LMB    cancels active box selection when pressed; cannot be same as Select
+    ImGuiKey                     query_toggle_mod;  // Ctrl   when held during selection, adds a query rect; has higher priority than override_mod
     ImGuiKey                     select_horz_mod;   // Alt    expands active box selection horizontally to plot edge when held
     ImGuiKey                     select_vert_mod;   // Shift  expands active box selection vertically to plot edge when held
     ImGuiKey                     override_mod;      // Ctrl   when held, all input is ignored; used to enable axis/plots as DND sources

@@ -2714,6 +2714,7 @@ DearPyGui::GetEntityParser(mvAppItemType type)
         args.push_back({ mvPyDataType::Integer, "box_select_button", mvArgType::KEYWORD_ARG, "internal_dpg.mvMouseButton_Right", "begins box selection when pressed and confirms selection when released" });
         args.push_back({ mvPyDataType::Integer, "box_select_mod", mvArgType::KEYWORD_ARG, "0", "begins box selection when pressed and confirms selection when released" });
         args.push_back({ mvPyDataType::Integer, "box_select_cancel_button", mvArgType::KEYWORD_ARG, "internal_dpg.mvMouseButton_Left", "cancels active box selection when pressed" });
+        args.push_back({ mvPyDataType::Integer, "query_toggle_mod", mvArgType::KEYWORD_ARG, "internal_dpg.mvKey_ModCtrl", "when held, active box selections turn into queries" });
         args.push_back({ mvPyDataType::Integer, "horizontal_mod", mvArgType::KEYWORD_ARG, "internal_dpg.mvKey_ModAlt", "expands active box selection/query horizontally to plot edge when held" });
         args.push_back({ mvPyDataType::Integer, "vertical_mod", mvArgType::KEYWORD_ARG, "internal_dpg.mvKey_ModShift", "expands active box selection/query vertically to plot edge when held" });
         args.push_back({ mvPyDataType::Integer, "override_mod", mvArgType::KEYWORD_ARG, "internal_dpg.mvKey_ModCtrl", "when held, all input is ignored; used to enable axis/plots as DND sources" });
@@ -2721,7 +2722,6 @@ DearPyGui::GetEntityParser(mvAppItemType type)
         args.push_back({ mvPyDataType::Integer, "zoom_rate", mvArgType::KEYWORD_ARG, "0.1", "zoom rate for scroll (e.g. 0.1f = 10% plot range every scroll click); make negative to invert" });
         args.push_back({ mvPyDataType::Integer, "query_button", mvArgType::DEPRECATED_REMOVE_KEYWORD_ARG, "0", "This refers to the old way of querying of ImPlot, now replaced with `DragRect()`" });
         args.push_back({ mvPyDataType::Integer, "query_mod", mvArgType::DEPRECATED_REMOVE_KEYWORD_ARG, "0", "This refers to the old way of querying of ImPlot, now replaced with `DragRect()`" });
-        args.push_back({ mvPyDataType::Integer, "query_toggle_mod", mvArgType::DEPRECATED_REMOVE_KEYWORD_ARG, "0", "This refers to the old way of querying of ImPlot, now replaced with `DragRect()`" });
 
         setup.about = "Adds a plot which is used to hold series, and can be drawn to with draw commands. For all _mod parameters use mvKey_ModX enums.";
         setup.category = { "Plotting", "Containers", "Widgets" };

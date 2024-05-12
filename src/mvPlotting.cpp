@@ -366,20 +366,23 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
 		// Note: we can't use `config.querying` here because in the frame when
 		// the query modifier gets pressed, `querying` is still false but we already
 		// need to disable `OverrideMod`.
-		if (ImHasFlag(IO.KeyMods, ImGuiMod_Ctrl) && (ImGui::IsMouseDown(ImPlot::GetInputMap().Select) || ImGui::IsMouseReleased(ImPlot::GetInputMap().Select)))
+		if (ImHasFlag(IO.KeyMods, config.query_toggle_mod) &&
+			(ImGui::IsMouseDown(config.select) || ImGui::IsMouseReleased(config.select)))
 		{
-			// Preventing ImPlot from getting stuck on selection
+			// Preventing ImPlot from getting stuck on selection if override modifier
+			// is pressed (e.g. when the override mod is the same as query toggle mod).
 			ImPlot::GetInputMap().OverrideMod = ImGuiMod_None;
 		}
 		else
 			ImPlot::GetInputMap().OverrideMod = config.override_mod;
 
-		if (config.querying && ImGui::IsMouseReleased(ImPlot::GetInputMap().Select))
+		if (config.querying && ImGui::IsMouseReleased(config.select))
 		{
 			config.rects.push_back(config.query_rect);
 			config.querying = false;
-			// Prevent ImPlot from handling mouse release on its own.
-			ImPlot::GetInputMap().OverrideMod = ImGuiMod_Ctrl;
+			// Prevent ImPlot from handling mouse release on its own. This will block
+			// input handling in the current frame (later we'll reset OverrideMod).
+			ImPlot::GetInputMap().OverrideMod = IO.KeyMods;
 			// Note: this will lock the setup and might therefore skip changes
 			// to the legend, drag points, and lines in this frame.  Nothing we
 			// can do about that, really.
@@ -432,7 +435,7 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
 			}
 		}
 
-		config.querying = ImHasFlag(IO.KeyMods, ImGuiMod_Ctrl) && ImPlot::IsPlotSelected();
+		config.querying = ImHasFlag(IO.KeyMods, config.query_toggle_mod) && ImPlot::IsPlotSelected();
 		if (config.querying)
 			config.query_rect = ImPlot::GetPlotSelection();
 
@@ -2460,6 +2463,7 @@ DearPyGui::set_configuration(PyObject* inDict, mvPlotConfig& outConfig)
 	if (PyObject* item = PyDict_GetItemString(inDict, "box_select_button")) outConfig.select = ToInt(item);
 	if (PyObject* item = PyDict_GetItemString(inDict, "box_select_cancel_button")) outConfig.select_cancel = ToInt(item);
 	if (PyObject* item = PyDict_GetItemString(inDict, "box_select_mod_button")) outConfig.select_mod = static_cast<ImGuiKey>(ToInt(item));
+	if (PyObject* item = PyDict_GetItemString(inDict, "query_toggle_mod")) outConfig.query_toggle_mod = static_cast<ImGuiKey>(ToInt(item));
 	if (PyObject* item = PyDict_GetItemString(inDict, "horizontal_mod")) outConfig.select_horz_mod = static_cast<ImGuiKey>(ToInt(item));
 	if (PyObject* item = PyDict_GetItemString(inDict, "vertical_mod")) outConfig.select_vert_mod = static_cast<ImGuiKey>(ToInt(item));
 	if (PyObject* item = PyDict_GetItemString(inDict, "use_local_time")) outConfig.localTime = ToBool(item);
@@ -3118,6 +3122,7 @@ DearPyGui::fill_configuration_dict(const mvPlotConfig& inConfig, PyObject* outDi
 	PyDict_SetItemString(outDict, "box_select_button", mvPyObject(ToPyInt(inConfig.select)));
 	PyDict_SetItemString(outDict, "box_select_mod", mvPyObject(ToPyInt(inConfig.select_mod)));
 	PyDict_SetItemString(outDict, "box_select_cancel_button", mvPyObject(ToPyInt(inConfig.select_cancel)));
+	PyDict_SetItemString(outDict, "query_toggle_mod", mvPyObject(ToPyInt(inConfig.query_toggle_mod)));
 	PyDict_SetItemString(outDict, "horizontal_mod", mvPyObject(ToPyInt(inConfig.select_horz_mod)));
 	PyDict_SetItemString(outDict, "vertical_mod", mvPyObject(ToPyInt(inConfig.select_vert_mod)));
 	PyDict_SetItemString(outDict, "override_mod", mvPyObject(ToPyInt(inConfig.override_mod)));
