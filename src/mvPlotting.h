@@ -230,6 +230,7 @@ struct mvDragPointConfig : _mvDragItem
 {
     std::shared_ptr<std::array<double, 2>> value = std::make_shared<std::array<double, 2>>(std::array<double, 2>{0.0, 0.0});
     double                       disabled_value[2]{};
+    bool                         show_label = true;
     float                        radius = 4.0f;
     bool                         clamped = true;
     ImVec2                       pixOffset;
@@ -246,6 +247,7 @@ struct mvDragLineConfig : _mvDragItem
 {
     std::shared_ptr<double> value = std::make_shared<double>(0.0);
     float               disabled_value = 0.0;
+    bool                show_label = true;
     float               thickness = 1.0f;
     bool                vertical = true;
 };

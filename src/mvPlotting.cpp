@@ -648,7 +648,7 @@ DearPyGui::draw_drag_line(ImDrawList* drawlist, mvAppItem& item, mvDragLineConfi
 		{
 			mvAddCallback(item.config.callback, item.uuid, nullptr, item.config.user_data);
 		}
-		if (!item.config.specifiedLabel.empty() && (hovered || held)) {
+		if (config.show_label && !item.config.specifiedLabel.empty() && (hovered || held)) {
             char buff[IMPLOT_LABEL_MAX_SIZE];
 			ImPlotContext& gp = *GImPlot;
 			ImPlotAxis& axis = gp.CurrentPlot->Axes[gp.CurrentPlot->CurrentX];
@@ -664,7 +664,7 @@ DearPyGui::draw_drag_line(ImDrawList* drawlist, mvAppItem& item, mvDragLineConfi
 		{
 			mvAddCallback(item.config.callback, item.uuid, nullptr, item.config.user_data);
 		}
-		if (!item.config.specifiedLabel.empty() && (hovered || held)) {
+		if (config.show_label && !item.config.specifiedLabel.empty() && (hovered || held)) {
             char buff[IMPLOT_LABEL_MAX_SIZE];
 			ImPlotContext& gp = *GImPlot;
 			ImPlotAxis& axis = gp.CurrentPlot->Axes[gp.CurrentPlot->CurrentY];
@@ -744,14 +744,24 @@ DearPyGui::draw_drag_point(ImDrawList* drawlist, mvAppItem& item, mvDragPointCon
 	dummyx = (*config.value.get())[0];
 	dummyy = (*config.value.get())[1];
 
-	if (ImPlot::DragPoint(item.uuid, &dummyx, &dummyy, config.color, config.radius, config.flags))
+	bool hovered = false;
+	bool held = false;
+	if (ImPlot::DragPoint(item.uuid, &dummyx, &dummyy, config.color, config.radius, config.flags, nullptr, &hovered, &held))
 	{
 		(*config.value.get())[0] = dummyx;
 		(*config.value.get())[1] = dummyy;
 		mvAddCallback(item.config.callback, item.uuid, nullptr, item.config.user_data);
 	}
-	if (!item.config.specifiedLabel.empty()) {
-		ImPlot::Annotation(dummyx, dummyy, config.color, config.pixOffset, config.clamped, "%s", item.config.specifiedLabel.c_str());
+	if (config.show_label && !item.config.specifiedLabel.empty() && (hovered || held)) {
+		ImPlotContext& gp = *GImPlot;
+		char x_buff[IMPLOT_LABEL_MAX_SIZE];
+		ImPlotAxis& x_axis = gp.CurrentPlot->Axes[gp.CurrentPlot->CurrentX];
+		ImPlot::LabelAxisValue(x_axis, dummyx, x_buff, sizeof(x_buff), true);
+		char y_buff[IMPLOT_LABEL_MAX_SIZE];
+		ImPlotAxis& y_axis = gp.CurrentPlot->Axes[gp.CurrentPlot->CurrentY];
+		ImPlot::LabelAxisValue(y_axis, dummyy, y_buff, sizeof(y_buff), true);
+		ImVec4 color = ImPlot::IsColorAuto(config.color) ? ImGui::GetStyleColorVec4(ImGuiCol_Text) : config.color;
+		ImPlot::Annotation(dummyx, dummyy, color, config.pixOffset, config.clamped, "%s = %s, %s", item.config.specifiedLabel.c_str(), x_buff, y_buff);
 	}
 }
 
@@ -2417,6 +2427,7 @@ DearPyGui::set_configuration(PyObject* inDict, mvDragLineConfig& outConfig)
 
 	if (PyObject* item = PyDict_GetItemString(inDict, "color")) outConfig.color = ToColor(item);
 	if (PyObject* item = PyDict_GetItemString(inDict, "thickness")) outConfig.thickness = ToFloat(item);
+	if (PyObject* item = PyDict_GetItemString(inDict, "show_label")) outConfig.show_label = ToBool(item);
 	if (PyObject* item = PyDict_GetItemString(inDict, "vertical")) outConfig.vertical = ToBool(item);
 
 	// helper for bit flipping
@@ -3162,6 +3173,7 @@ DearPyGui::fill_configuration_dict(const mvDragLineConfig& inConfig, PyObject* o
 
 	PyDict_SetItemString(outDict, "color", ToPyColor(inConfig.color));
 	PyDict_SetItemString(outDict, "thickness", ToPyFloat(inConfig.thickness));
+	PyDict_SetItemString(outDict, "show_label", ToPyBool(inConfig.thickness));
 	PyDict_SetItemString(outDict, "vertical", ToPyBool(inConfig.vertical));
 
 

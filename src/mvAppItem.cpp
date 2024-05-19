@@ -3847,7 +3847,8 @@ DearPyGui::GetEntityParser(mvAppItemType type)
         args.push_back({ mvPyDataType::DoubleList, "default_value", mvArgType::KEYWORD_ARG, "(0.0, 0.0)" });
         args.push_back({ mvPyDataType::IntList, "color", mvArgType::KEYWORD_ARG, "(0, 0, 0, -255)" });
         args.push_back({ mvPyDataType::Float, "thickness", mvArgType::KEYWORD_ARG, "1.0" });
-        args.push_back({ mvPyDataType::FloatList, "offset", mvArgType::KEYWORD_ARG, "(0.0, 0.0)", "Offset of the label, in pixels, relative to the drag point itself" });
+        args.push_back({ mvPyDataType::Bool, "show_label", mvArgType::KEYWORD_ARG, "True" });
+        args.push_back({ mvPyDataType::FloatList, "offset", mvArgType::KEYWORD_ARG, "(16.0, 8.0)", "Offset of the label, in pixels, relative to the drag point itself" });
         args.push_back({ mvPyDataType::Bool, "clamped", mvArgType::KEYWORD_ARG, "True", "Keep the label within the visible area of the plot even if the drag point itself goes outside of the visible area" });
         args.push_back({ mvPyDataType::Bool, "delayed", mvArgType::KEYWORD_ARG, "False", "tool rendering will be delayed one frame; useful when applying position-constraints" });
         args.push_back({ mvPyDataType::Bool, "no_cursor", mvArgType::KEYWORD_ARG, "False", "drag tools won't change cursor icons when hovered or held" });
@@ -3896,6 +3897,7 @@ DearPyGui::GetEntityParser(mvAppItemType type)
         args.push_back({ mvPyDataType::Double, "default_value", mvArgType::KEYWORD_ARG, "0.0" });
         args.push_back({ mvPyDataType::IntList, "color", mvArgType::KEYWORD_ARG, "(0, 0, 0, -255)" });
         args.push_back({ mvPyDataType::Float, "thickness", mvArgType::KEYWORD_ARG, "1.0" });
+        args.push_back({ mvPyDataType::Bool, "show_label", mvArgType::KEYWORD_ARG, "True" });
         args.push_back({ mvPyDataType::Bool, "vertical", mvArgType::KEYWORD_ARG, "True" });
         args.push_back({ mvPyDataType::Bool, "delayed", mvArgType::KEYWORD_ARG, "False", "tool rendering will be delayed one frame; useful when applying position-constraints" });
         args.push_back({ mvPyDataType::Bool, "no_cursor", mvArgType::KEYWORD_ARG, "False", "drag tools won't change cursor icons when hovered or held" });

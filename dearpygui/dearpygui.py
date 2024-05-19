@@ -4150,7 +4150,7 @@ def add_drag_intx(*, label: str =None, user_data: Any =None, use_internal_label:
 
 	return internal_dpg.add_drag_intx(label=label, user_data=user_data, use_internal_label=use_internal_label, tag=tag, width=width, indent=indent, parent=parent, before=before, source=source, payload_type=payload_type, callback=callback, drag_callback=drag_callback, drop_callback=drop_callback, show=show, enabled=enabled, pos=pos, filter_key=filter_key, tracked=tracked, track_offset=track_offset, default_value=default_value, size=size, format=format, speed=speed, min_value=min_value, max_value=max_value, no_input=no_input, clamped=clamped, **kwargs)
 
-def add_drag_line(*, label: str =None, user_data: Any =None, use_internal_label: bool =True, tag: Union[int, str] =0, parent: Union[int, str] =0, before: Union[int, str] =0, source: Union[int, str] =0, callback: Callable =None, show: bool =True, default_value: float =0.0, color: Union[List[int], Tuple[int, ...]] =(0, 0, 0, -255), thickness: float =1.0, vertical: bool =True, delayed: bool =False, no_cursor: bool =False, no_fit: bool =False, no_inputs: bool =False, **kwargs) -> Union[int, str]:
+def add_drag_line(*, label: str =None, user_data: Any =None, use_internal_label: bool =True, tag: Union[int, str] =0, parent: Union[int, str] =0, before: Union[int, str] =0, source: Union[int, str] =0, callback: Callable =None, show: bool =True, default_value: float =0.0, color: Union[List[int], Tuple[int, ...]] =(0, 0, 0, -255), thickness: float =1.0, show_label: bool =True, vertical: bool =True, delayed: bool =False, no_cursor: bool =False, no_fit: bool =False, no_inputs: bool =False, **kwargs) -> Union[int, str]:
 	"""	 Adds a drag line to a plot.
 
 	Args:
@@ -4166,6 +4166,7 @@ def add_drag_line(*, label: str =None, user_data: Any =None, use_internal_label:
 		default_value (float, optional): 
 		color (Union[List[int], Tuple[int, ...]], optional): 
 		thickness (float, optional): 
+		show_label (bool, optional): 
 		vertical (bool, optional): 
 		delayed (bool, optional): tool rendering will be delayed one frame; useful when applying position-constraints
 		no_cursor (bool, optional): drag tools won't change cursor icons when hovered or held
@@ -4180,7 +4181,7 @@ def add_drag_line(*, label: str =None, user_data: Any =None, use_internal_label:
 		warnings.warn('id keyword renamed to tag', DeprecationWarning, 2)
 		tag=kwargs['id']
 
-	return internal_dpg.add_drag_line(label=label, user_data=user_data, use_internal_label=use_internal_label, tag=tag, parent=parent, before=before, source=source, callback=callback, show=show, default_value=default_value, color=color, thickness=thickness, vertical=vertical, delayed=delayed, no_cursor=no_cursor, no_fit=no_fit, no_inputs=no_inputs, **kwargs)
+	return internal_dpg.add_drag_line(label=label, user_data=user_data, use_internal_label=use_internal_label, tag=tag, parent=parent, before=before, source=source, callback=callback, show=show, default_value=default_value, color=color, thickness=thickness, show_label=show_label, vertical=vertical, delayed=delayed, no_cursor=no_cursor, no_fit=no_fit, no_inputs=no_inputs, **kwargs)
 
 def add_drag_payload(*, label: str =None, user_data: Any =None, use_internal_label: bool =True, tag: Union[int, str] =0, parent: Union[int, str] =0, show: bool =True, drag_data: Any =None, drop_data: Any =None, payload_type: str ='$$DPG_PAYLOAD', **kwargs) -> Union[int, str]:
 	"""	 User data payload for drag and drop operations.
@@ -4206,7 +4207,7 @@ def add_drag_payload(*, label: str =None, user_data: Any =None, use_internal_lab
 
 	return internal_dpg.add_drag_payload(label=label, user_data=user_data, use_internal_label=use_internal_label, tag=tag, parent=parent, show=show, drag_data=drag_data, drop_data=drop_data, payload_type=payload_type, **kwargs)
 
-def add_drag_point(*, label: str =None, user_data: Any =None, use_internal_label: bool =True, tag: Union[int, str] =0, parent: Union[int, str] =0, before: Union[int, str] =0, source: Union[int, str] =0, callback: Callable =None, show: bool =True, default_value: Any =(0.0, 0.0), color: Union[List[int], Tuple[int, ...]] =(0, 0, 0, -255), thickness: float =1.0, offset: Union[List[float], Tuple[float, ...]] =(0.0, 0.0), clamped: bool =True, delayed: bool =False, no_cursor: bool =False, no_fit: bool =False, no_inputs: bool =False, **kwargs) -> Union[int, str]:
+def add_drag_point(*, label: str =None, user_data: Any =None, use_internal_label: bool =True, tag: Union[int, str] =0, parent: Union[int, str] =0, before: Union[int, str] =0, source: Union[int, str] =0, callback: Callable =None, show: bool =True, default_value: Any =(0.0, 0.0), color: Union[List[int], Tuple[int, ...]] =(0, 0, 0, -255), thickness: float =1.0, show_label: bool =True, offset: Union[List[float], Tuple[float, ...]] =(16.0, 8.0), clamped: bool =True, delayed: bool =False, no_cursor: bool =False, no_fit: bool =False, no_inputs: bool =False, **kwargs) -> Union[int, str]:
 	"""	 Adds a drag point to a plot.
 
 	Args:
@@ -4222,6 +4223,7 @@ def add_drag_point(*, label: str =None, user_data: Any =None, use_internal_label
 		default_value (Any, optional): 
 		color (Union[List[int], Tuple[int, ...]], optional): 
 		thickness (float, optional): 
+		show_label (bool, optional): 
 		offset (Union[List[float], Tuple[float, ...]], optional): Offset of the label, in pixels, relative to the drag point itself
 		clamped (bool, optional): Keep the label within the visible area of the plot even if the drag point itself goes outside of the visible area
 		delayed (bool, optional): tool rendering will be delayed one frame; useful when applying position-constraints
@@ -4237,7 +4239,7 @@ def add_drag_point(*, label: str =None, user_data: Any =None, use_internal_label
 		warnings.warn('id keyword renamed to tag', DeprecationWarning, 2)
 		tag=kwargs['id']
 
-	return internal_dpg.add_drag_point(label=label, user_data=user_data, use_internal_label=use_internal_label, tag=tag, parent=parent, before=before, source=source, callback=callback, show=show, default_value=default_value, color=color, thickness=thickness, offset=offset, clamped=clamped, delayed=delayed, no_cursor=no_cursor, no_fit=no_fit, no_inputs=no_inputs, **kwargs)
+	return internal_dpg.add_drag_point(label=label, user_data=user_data, use_internal_label=use_internal_label, tag=tag, parent=parent, before=before, source=source, callback=callback, show=show, default_value=default_value, color=color, thickness=thickness, show_label=show_label, offset=offset, clamped=clamped, delayed=delayed, no_cursor=no_cursor, no_fit=no_fit, no_inputs=no_inputs, **kwargs)
 
 def add_drag_rect(*, label: str =None, user_data: Any =None, use_internal_label: bool =True, tag: Union[int, str] =0, parent: Union[int, str] =0, before: Union[int, str] =0, source: Union[int, str] =0, callback: Callable =None, show: bool =True, default_value: Any =(0.0, 0.0, 0.0, 0.0), color: Union[List[int], Tuple[int, ...]] =(0, 0, 0, -255), delayed: bool =False, no_cursor: bool =False, no_fit: bool =False, no_inputs: bool =False, **kwargs) -> Union[int, str]:
 	"""	 Adds a drag rectangle to a plot.
