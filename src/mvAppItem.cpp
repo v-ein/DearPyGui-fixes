@@ -5483,12 +5483,6 @@ DearPyGui::OnChildAdded(mvAppItem* item, std::shared_ptr<mvAppItem> child)
             mvPlot* actualItem = (mvPlot*)item;
             if (child->type == mvAppItemType::mvPlotLegend)
                 actualItem->configData._flags &= ~ImPlotFlags_NoLegend;
-
-            if (child->type == mvAppItemType::mvPlotAxis)
-            {
-                actualItem->updateFlags();
-                actualItem->updateAxesNames();
-            }
             return;
         }
 
@@ -5536,8 +5530,6 @@ DearPyGui::OnChildRemoved(mvAppItem* item, std::shared_ptr<mvAppItem> child)
             mvPlot* actualItem = (mvPlot*)item;
             if (child->type == mvAppItemType::mvPlotLegend)
                 actualItem->configData._flags |= ImPlotFlags_NoLegend;
-            if (child->type == mvAppItemType::mvPlotAxis)
-                actualItem->updateFlags();
             return;
         }
 

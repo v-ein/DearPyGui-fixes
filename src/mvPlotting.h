@@ -407,9 +407,7 @@ struct mvPlotConfig
     float                        zoom_rate = 0.1f;  // 0.1f   zoom rate for scroll (e.g. 0.1f = 10% plot range every scroll click); make negative to invert
     bool                         delete_rect = true;// true  allows to delete last drag rect created with double left mouse click
 
-    std::array<std::string, ImAxis_COUNT>       axesNames;
     ImPlotFlags                                 _flags = ImPlotFlags_NoLegend;
-    std::array<ImPlotAxisFlags, ImAxis_COUNT>   axesFlags;  // Automatically set to 0 (which is ImPlotAxisFlags_None)
     bool                                        _newColorMap = false; // to bust color cache
     bool                                        _useColorMap = false;
     ImPlotColormap                              _colormap = ImPlotColormap_Deep;
@@ -810,8 +808,6 @@ class mvPlot : public mvAppItem
 public:
     mvPlotConfig configData{};
     explicit mvPlot(mvUUID uuid) : mvAppItem(uuid) { config.width = config.height = -1; }
-    void updateFlags();
-    void updateAxesNames();
     void draw(ImDrawList* drawlist, float x, float y) override { DearPyGui::draw_plot(drawlist, *this, configData); }
     void handleSpecificKeywordArgs(PyObject* dict) override { DearPyGui::set_configuration(dict, configData); }
     void getSpecificConfiguration(PyObject* dict) override { DearPyGui::fill_configuration_dict(configData, dict); }

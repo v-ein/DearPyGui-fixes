@@ -325,6 +325,7 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
 	{	
 
 		// gives axes change to make changes to ticks, limits, etc.
+		ImAxis next_y_axis = ImAxis_Y1;
 		for (auto& child : item.childslots[1])
 		{
 			// skip item if it's not shown
@@ -335,7 +336,20 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
 			{
 				mvPlotAxis* axis = static_cast<mvPlotAxis*>(child.get());
 				ImAxis_ id_axis = static_cast<ImAxis_>(axis->configData.axis);
-				ImPlot::SetupAxis(id_axis, config.axesNames[id_axis].c_str(), axis->configData.flags);
+
+				// auto-assigning additional Y axes for compatibility with DPG 1.11 and earlier versions
+				auto flags = axis->configData.flags;
+				if (id_axis == ImAxis_Y1)
+				{
+					if (axis->configData.axis < next_y_axis)
+					{
+						id_axis = static_cast<ImAxis_>(next_y_axis);
+						flags |= ImPlotAxisFlags_Opposite;
+					}
+					++next_y_axis;
+				}
+
+				ImPlot::SetupAxis(id_axis, axis->config.specifiedLabel.c_str(), flags);
 				if (axis->configData.setLimits || axis->configData._dirty)
 				{
 					ImPlot::SetupAxisLimits(id_axis, axis->configData.limits.x, axis->configData.limits.y, ImGuiCond_Always);
@@ -3073,12 +3087,6 @@ DearPyGui::set_configuration(PyObject* inDict, mvPlotAxisConfig& outConfig, mvAp
 	flagop("lock_min", ImPlotAxisFlags_LockMin, outConfig.flags);
 	flagop("lock_max", ImPlotAxisFlags_LockMax, outConfig.flags);
 
-	if (item.info.parentPtr)
-	{
-		static_cast<mvPlot*>(item.info.parentPtr)->updateFlags();
-		static_cast<mvPlot*>(item.info.parentPtr)->updateAxesNames();
-	}
-
 	if (item.info.shownLastFrame)
 	{
 		item.info.shownLastFrame = false;
@@ -3706,25 +3714,4 @@ void mvAnnotation::setPyValue(PyObject* value)
 		*configData.value = temp_array;
 	else
 		configData.value = std::make_shared<std::array<double, 4>>(temp_array);
-}
-
-void mvPlot::updateFlags()
-{
-	for (auto& child : childslots[1])
-	{
-		mvPlotAxis* axis = static_cast<mvPlotAxis*>(child.get());
-		configData.axesFlags[axis->configData.axis] = axis->configData.flags;
-	}
-}
-
-void mvPlot::updateAxesNames()
-{
-	std::fill(configData.axesNames.begin(), configData.axesNames.end(), std::string());  // clear names
-
-	for (auto& child : childslots[1])
-	{
-		mvPlotAxis* axis = static_cast<mvPlotAxis*>(child.get());
-		configData.axesNames[axis->configData.axis] = axis->config.specifiedLabel;
-	}
-
 }
