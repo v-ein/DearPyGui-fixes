@@ -2514,6 +2514,7 @@ DearPyGui::set_configuration(PyObject* inDict, mvDragPointConfig& outConfig)
 
 	if (PyObject* item = PyDict_GetItemString(inDict, "color")) outConfig.color = ToColor(item);
 	if (PyObject* item = PyDict_GetItemString(inDict, "radius")) outConfig.radius = ToFloat(item);
+	if (PyObject* item = PyDict_GetItemString(inDict, "show_label")) outConfig.show_label = ToBool(item);
 	if (PyObject* item = PyDict_GetItemString(inDict, "clamped")) outConfig.clamped = ToBool(item);
 	if (PyObject* item = PyDict_GetItemString(inDict, "offset")) outConfig.pixOffset = ToVec2(item);
 
@@ -3218,6 +3219,7 @@ DearPyGui::fill_configuration_dict(const mvDragPointConfig& inConfig, PyObject* 
 		return;
 
 	PyDict_SetItemString(outDict, "raidus", mvPyObject(ToPyFloat(inConfig.radius)));
+	PyDict_SetItemString(outDict, "show_label", mvPyObject(ToPyBool(inConfig.show_label)));
 	PyDict_SetItemString(outDict, "color", mvPyObject(ToPyColor(inConfig.color)));
 	PyDict_SetItemString(outDict, "clamped", mvPyObject(ToPyBool(inConfig.clamped)));
 	PyDict_SetItemString(outDict, "offset", mvPyObject(ToPyPair(inConfig.pixOffset.x, inConfig.pixOffset.y)));
