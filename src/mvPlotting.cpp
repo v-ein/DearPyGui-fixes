@@ -639,24 +639,39 @@ DearPyGui::draw_drag_line(ImDrawList* drawlist, mvAppItem& item, mvDragLineConfi
 
 	ScopedID id(item.uuid);
 
+	bool hovered = false;
+	bool held = false;
+
 	if (config.vertical)
 	{
-		if (ImPlot::DragLineX(item.uuid, config.value.get(), config.color, config.thickness, config.flags))
+		if (ImPlot::DragLineX(item.uuid, config.value.get(), config.color, config.thickness, config.flags, nullptr, &hovered, &held))
 		{
 			mvAddCallback(item.config.callback, item.uuid, nullptr, item.config.user_data);
 		}
-		if (!item.config.specifiedLabel.empty()) {
-			ImPlot::TagX(*config.value.get(), config.color, "%s", item.config.specifiedLabel.c_str());
+		if (!item.config.specifiedLabel.empty() && (hovered || held)) {
+            char buff[IMPLOT_LABEL_MAX_SIZE];
+			ImPlotContext& gp = *GImPlot;
+			ImPlotAxis& axis = gp.CurrentPlot->Axes[gp.CurrentPlot->CurrentX];
+			auto pos = *config.value.get();
+    		ImPlot::LabelAxisValue(axis, pos, buff, sizeof(buff), true);
+			ImVec4 color = ImPlot::IsColorAuto(config.color) ? ImGui::GetStyleColorVec4(ImGuiCol_Text) : config.color;
+			ImPlot::Annotation(pos, ImPlot::GetPlotLimits().Min().y, color, ImVec2(0, 0), true, "%s = %s", item.config.specifiedLabel.c_str(), buff);
 		}
 	}
 	else
 	{
-		if (ImPlot::DragLineY(item.uuid, config.value.get(), config.color, config.thickness, config.flags))
+		if (ImPlot::DragLineY(item.uuid, config.value.get(), config.color, config.thickness, config.flags, nullptr, &hovered, &held))
 		{
 			mvAddCallback(item.config.callback, item.uuid, nullptr, item.config.user_data);
 		}
-		if (!item.config.specifiedLabel.empty()) {
-			ImPlot::TagY(*config.value.get(), config.color, "%s", item.config.specifiedLabel.c_str());
+		if (!item.config.specifiedLabel.empty() && (hovered || held)) {
+            char buff[IMPLOT_LABEL_MAX_SIZE];
+			ImPlotContext& gp = *GImPlot;
+			ImPlotAxis& axis = gp.CurrentPlot->Axes[gp.CurrentPlot->CurrentY];
+			auto label_pos = *config.value.get();
+    		ImPlot::LabelAxisValue(axis, label_pos, buff, sizeof(buff), true);
+			ImVec4 color = ImPlot::IsColorAuto(config.color) ? ImGui::GetStyleColorVec4(ImGuiCol_Text) : config.color;
+			ImPlot::Annotation(ImPlot::GetPlotLimits().Min().x, label_pos, color, ImVec2(0, 0), true, "%s = %s", item.config.specifiedLabel.c_str(), buff);
 		}
 	}
 }
