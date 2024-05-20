@@ -3456,10 +3456,10 @@ DearPyGui::GetEntityParser(mvAppItemType type)
         args.push_back({ mvPyDataType::FloatList, "pmin", mvArgType::REQUIRED_ARG, "...", "Min point of bounding rectangle." });
         args.push_back({ mvPyDataType::FloatList, "pmax", mvArgType::REQUIRED_ARG, "...", "Max point of bounding rectangle." });
         args.push_back({ mvPyDataType::IntList, "color", mvArgType::KEYWORD_ARG, "(255, 255, 255, 255)" });
-        args.push_back({ mvPyDataType::IntList, "color_upper_left", mvArgType::KEYWORD_ARG, "(255, 255, 255, 255)", "'multicolor' must be set to 'True'" });
-        args.push_back({ mvPyDataType::IntList, "color_upper_right", mvArgType::KEYWORD_ARG, "(255, 255, 255, 255)", "'multicolor' must be set to 'True'" });
-        args.push_back({ mvPyDataType::IntList, "color_bottom_right", mvArgType::KEYWORD_ARG, "(255, 255, 255, 255)", "'multicolor' must be set to 'True'" });
-        args.push_back({ mvPyDataType::IntList, "color_bottom_left", mvArgType::KEYWORD_ARG, "(255, 255, 255, 255)", "'multicolor' must be set to 'True'" });
+        args.push_back({ mvPyDataType::IntList, "color_upper_left", mvArgType::DEPRECATED_KEYWORD_ARG, "(255, 255, 255, 255)", "Use corner_colors instead", "Use corner_colors instead." });
+        args.push_back({ mvPyDataType::IntList, "color_upper_right", mvArgType::DEPRECATED_KEYWORD_ARG, "(255, 255, 255, 255)", "Use corner_colors instead", "Use corner_colors instead." });
+        args.push_back({ mvPyDataType::IntList, "color_bottom_right", mvArgType::DEPRECATED_KEYWORD_ARG, "(255, 255, 255, 255)", "Use corner_colors instead", "Use corner_colors instead." });
+        args.push_back({ mvPyDataType::IntList, "color_bottom_left", mvArgType::DEPRECATED_KEYWORD_ARG, "(255, 255, 255, 255)", "Use corner_colors instead", "Use corner_colors instead." });
         args.push_back({ mvPyDataType::IntList, "fill", mvArgType::KEYWORD_ARG, "(0, 0, 0, -255)" });
         args.push_back({ mvPyDataType::Bool, "multicolor", mvArgType::KEYWORD_ARG, "False" });
         args.push_back({ mvPyDataType::Float, "rounding", mvArgType::KEYWORD_ARG, "0.0", "Number of pixels of the radius that will round the corners of the rectangle. Note: doesn't work with multicolor" });
