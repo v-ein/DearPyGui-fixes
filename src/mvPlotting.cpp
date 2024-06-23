@@ -546,19 +546,18 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
         for (int i = 0; i < config.rects.size(); ++i) {
 			// TODO: Implement flags
 			bool hovered = false;
-			bool modified = ImPlot::DragRect(i,&config.rects[i].X.Min,&config.rects[i].Y.Min,&config.rects[i].X.Max,&config.rects[i].Y.Max,ImVec4(1,0,1,1), ImPlotDragToolFlags_None, nullptr, &hovered);
-            query_dirty |= modified;
-			// We're not interested in double-clicks that modify the query rect
-			// (in particular, double-clicks on rect edges), and to filter them out,
-			// we additionally check for `modified` to be false.
-			if (hovered && !modified && ImGui::IsMouseDoubleClicked(config.select_cancel))
+			query_dirty |= ImPlot::DragRect(i,&config.rects[i].X.Min,&config.rects[i].Y.Min,&config.rects[i].X.Max,&config.rects[i].Y.Max,ImVec4(1,0,1,1), ImPlotDragToolFlags_None, nullptr, &hovered);
+			if (hovered && ImGui::IsMouseDoubleClicked(config.select_cancel))
 			{
 				// remember it for future deletion
 				delete_idx = i;
 			}
         }
 		// Delete rect on double click.
-		if (delete_idx >= 0)
+		// We're not interested in double-clicks that modify a query rect
+		// (in particular, double-clicks on rect edges), and to filter them out,
+		// we additionally check for `query_dirty` to be false.
+		if (delete_idx >= 0 && !query_dirty)
 		{
 			config.rects.erase(config.rects.begin() + delete_idx);
 			// Preventing plot auto-fit if it uses the same mouse button.
