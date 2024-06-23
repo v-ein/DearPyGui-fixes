@@ -538,20 +538,41 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
 		if (config.querying)
 			config.query_rect = ImPlot::GetPlotSelection();
 
-		bool query_rect_hovered = false;
+		// While rendering query rects, we'll see which of them the user asks to
+		// delete (by double-clicking it).  We need to run through the entire list
+		// to make sure that we pick the topmost candidate if there's more than one.
+		int delete_idx = -1;
+		bool query_dirty = false;
         for (int i = 0; i < config.rects.size(); ++i) {
 			// TODO: Implement flags
 			bool hovered = false;
 			bool modified = ImPlot::DragRect(i,&config.rects[i].X.Min,&config.rects[i].Y.Min,&config.rects[i].X.Max,&config.rects[i].Y.Max,ImVec4(1,0,1,1), ImPlotDragToolFlags_None, nullptr, &hovered);
-            config._query_dirty |= modified;
+            query_dirty |= modified;
 			// We're not interested in double-clicks that modify the query rect
 			// (in particular, double-clicks on rect edges), and to filter them out,
 			// we additionally check for `modified` to be false.
-			if (hovered && !modified)
-				query_rect_hovered = true;
+			if (hovered && !modified && ImGui::IsMouseDoubleClicked(config.select_cancel))
+			{
+				// remember it for future deletion
+				delete_idx = i;
+			}
         }
+		// Delete rect on double click.
+		if (delete_idx >= 0)
+		{
+			config.rects.erase(config.rects.begin() + delete_idx);
+			// Preventing plot auto-fit if it uses the same mouse button.
+			// Kind of a dirty trick but double-click has already set
+			// all `FitThisFrame` to true anyway.
+			if (config.fit == config.select_cancel)
+			{
+				context->CurrentPlot->FitThisFrame = false;
+				for (int j = 0; j < ImAxis_COUNT; ++j)
+					context->CurrentPlot->Axes[j].FitThisFrame = false;
+			}
+		}
 
-		if (item.config.callback != nullptr && config._query_dirty)
+		if (item.config.callback != nullptr && query_dirty)
 		{
 			for(auto rect : config.rects) {
 				if (item.config.alias.empty()) {
@@ -632,32 +653,6 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
 			}
 		}
 		
-		if (query_rect_hovered)
-		{
-			// Delete rect on double click
-			if (config.rects.size() > 0 && ImGui::IsMouseDoubleClicked(ImPlot::GetInputMap().SelectCancel)) {
-				float x = GContext->input.mousePlotPos.x;
-				float y = GContext->input.mousePlotPos.y;
-				// Starting from the end to delete the upper element
-				for(int i = config.rects.size() - 1; i >= 0; i--) {
-					auto rect = config.rects[i];
-					if (x > rect.Min().x && x < rect.Max().x && y > rect.Min().y && y < rect.Max().y) {
-						config.rects.erase(config.rects.begin() + i);
-						// Preventing plot auto-fit if it uses the same mouse button.
-						// Kind of a dirty trick but double-click has already set
-						// all `FitThisFrame` to true anyway.
-						if (config.fit == config.select_cancel)
-						{
-							context->CurrentPlot->FitThisFrame = false;
-							for (int j = 0; j < ImAxis_COUNT; ++j)
-								context->CurrentPlot->Axes[j].FitThisFrame = false;
-						}
-						break;
-					}
-				}
-			}
-		}
-
 		ImPlot::EndPlot();
 
 	}

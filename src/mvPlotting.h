@@ -418,7 +418,6 @@ struct mvPlotConfig
     ImGuiKey                     override_mod;      // Ctrl   when held, all input is ignored; used to enable axis/plots as DND sources
     ImGuiKey                     zoom_mod;          // none   optional modifier that must be held for scroll wheel zooming
     float                        zoom_rate = 0.1f;  // 0.1f   zoom rate for scroll (e.g. 0.1f = 10% plot range every scroll click); make negative to invert
-    bool                         delete_rect = true;// true  allows to delete last drag rect created with double left mouse click
 
     ImPlotFlags                                 _flags = ImPlotFlags_NoLegend;
     bool                                        _newColorMap = false; // to bust color cache
@@ -430,7 +429,6 @@ struct mvPlotConfig
     ImPlotRect                                  query_rect;
     bool                                        _fitDirty = false;
     bool                                        _axisfitDirty[ImAxis_COUNT] = { false, false, false, false, false, false }; 
-    bool                                        _query_dirty = false;
     ImPlotInputMap                              _originalMap = ImPlotInputMap(); // custom input mapping
     bool                                        localTime = false;
     bool                                        iSO8601 = false;
