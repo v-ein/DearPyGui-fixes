@@ -538,9 +538,17 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
 		if (config.querying)
 			config.query_rect = ImPlot::GetPlotSelection();
 
+		bool query_rect_hovered = false;
         for (int i = 0; i < config.rects.size(); ++i) {
 			// TODO: Implement flags
-            config._query_dirty |= ImPlot::DragRect(i,&config.rects[i].X.Min,&config.rects[i].Y.Min,&config.rects[i].X.Max,&config.rects[i].Y.Max,ImVec4(1,0,1,1));
+			bool hovered = false;
+			bool modified = ImPlot::DragRect(i,&config.rects[i].X.Min,&config.rects[i].Y.Min,&config.rects[i].X.Max,&config.rects[i].Y.Max,ImVec4(1,0,1,1), ImPlotDragToolFlags_None, nullptr, &hovered);
+            config._query_dirty |= modified;
+			// We're not interested in double-clicks that modify the query rect
+			// (in particular, double-clicks on rect edges), and to filter them out,
+			// we additionally check for `modified` to be false.
+			if (hovered && !modified)
+				query_rect_hovered = true;
         }
 
 		if (item.config.callback != nullptr && config._query_dirty)
@@ -624,7 +632,7 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
 			}
 		}
 		
-		if (ImPlot::IsPlotHovered())
+		if (query_rect_hovered)
 		{
 			// Delete rect on double click
 			if (config.rects.size() > 0 && ImGui::IsMouseDoubleClicked(ImPlot::GetInputMap().SelectCancel)) {
@@ -635,6 +643,15 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
 					auto rect = config.rects[i];
 					if (x > rect.Min().x && x < rect.Max().x && y > rect.Min().y && y < rect.Max().y) {
 						config.rects.erase(config.rects.begin() + i);
+						// Preventing plot auto-fit if it uses the same mouse button.
+						// Kind of a dirty trick but double-click has already set
+						// all `FitThisFrame` to true anyway.
+						if (config.fit == config.select_cancel)
+						{
+							context->CurrentPlot->FitThisFrame = false;
+							for (int j = 0; j < ImAxis_COUNT; ++j)
+								context->CurrentPlot->Axes[j].FitThisFrame = false;
+						}
 						break;
 					}
 				}
