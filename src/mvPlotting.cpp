@@ -491,6 +491,7 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
 		else
 			ImPlot::GetInputMap().OverrideMod = config.override_mod;
 
+		bool query_dirty = false;
 		if (config.querying && ImGui::IsMouseReleased(config.select))
 		{
 			config.rects.push_back(config.query_rect);
@@ -502,6 +503,8 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
 			// to the legend, drag points, and lines in this frame.  Nothing we
 			// can do about that, really.
 			ImPlot::CancelPlotSelection();
+			// We've updated the list, let's report this
+			query_dirty = true;
 		}
 
 		// legend, drag point and lines
@@ -542,7 +545,6 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
 		// delete (by double-clicking it).  We need to run through the entire list
 		// to make sure that we pick the topmost candidate if there's more than one.
 		int delete_idx = -1;
-		bool query_dirty = false;
         for (int i = 0; i < config.rects.size(); ++i) {
 			// TODO: Implement flags
 			bool hovered = false;
@@ -569,32 +571,32 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
 				for (int j = 0; j < ImAxis_COUNT; ++j)
 					context->CurrentPlot->Axes[j].FitThisFrame = false;
 			}
+			// We've updated the list, let's report this
+			query_dirty = true;
 		}
 
 		if (item.config.callback != nullptr && query_dirty)
 		{
-			for(auto rect : config.rects) {
-				if (item.config.alias.empty()) {
-					mvSubmitCallback([=, &item]() {
-						PyObject* result = PyTuple_New(config.rects.size());
-						for (int i = 0; i < config.rects.size(); ++i) {
-							auto rectMin = config.rects[i].Min();
-							auto rectMax = config.rects[i].Max();
-							PyTuple_SetItem(result, i, Py_BuildValue("(dddd)", rectMin.x, rectMin.y, rectMax.x, rectMax.y));
-						}
-						mvAddCallback(item.config.callback, item.uuid, result, item.config.user_data);
-					});
-				} else {
-					mvSubmitCallback([=, &item]() {
-						PyObject* result = PyTuple_New(config.rects.size());
-						for (int i = 0; i < config.rects.size(); ++i) {
-							auto rectMin = config.rects[i].Min();
-							auto rectMax = config.rects[i].Max();
-							PyTuple_SetItem(result, i, Py_BuildValue("(dddd)", rectMin.x, rectMin.y, rectMax.x, rectMax.y));
-						}
-						mvAddCallback(item.config.callback, item.config.alias, result, item.config.user_data);
-					});
-				}
+			if (item.config.alias.empty()) {
+				mvSubmitCallback([=, &item]() {
+					PyObject* result = PyTuple_New(config.rects.size());
+					for (int i = 0; i < config.rects.size(); ++i) {
+						auto rectMin = config.rects[i].Min();
+						auto rectMax = config.rects[i].Max();
+						PyTuple_SetItem(result, i, Py_BuildValue("(dddd)", rectMin.x, rectMin.y, rectMax.x, rectMax.y));
+					}
+					mvAddCallback(item.config.callback, item.uuid, result, item.config.user_data);
+				});
+			} else {
+				mvSubmitCallback([=, &item]() {
+					PyObject* result = PyTuple_New(config.rects.size());
+					for (int i = 0; i < config.rects.size(); ++i) {
+						auto rectMin = config.rects[i].Min();
+						auto rectMax = config.rects[i].Max();
+						PyTuple_SetItem(result, i, Py_BuildValue("(dddd)", rectMin.x, rectMin.y, rectMax.x, rectMax.y));
+					}
+					mvAddCallback(item.config.callback, item.config.alias, result, item.config.user_data);
+				});
 			}
 		}
 
