@@ -210,20 +210,8 @@ def add_float_vect_value(*, label: str ='', user_data: Any ='', use_internal_lab
 	"""Adds a float vect value."""
 	...
 
-def add_font(file : str, size : int, *, label: str ='', user_data: Any ='', use_internal_label: bool ='', tag: Union[int, str] ='', pixel_snapH: bool ='', parent: Union[int, str] ='') -> Union[int, str]:
+def add_font(file : str, size : int, *, label: str ='', user_data: Any ='', use_internal_label: bool ='', tag: Union[int, str] ='', pixel_snapH: bool ='', pixel_snapV: bool ='', parent: Union[int, str] ='') -> Union[int, str]:
 	"""Adds font to a font registry."""
-	...
-
-def add_font_chars(chars : Union[List[int], Tuple[int, ...]], *, label: str ='', user_data: Any ='', use_internal_label: bool ='', tag: Union[int, str] ='', parent: Union[int, str] ='') -> Union[int, str]:
-	"""Adds specific font characters to a font."""
-	...
-
-def add_font_range(first_char : int, last_char : int, *, label: str ='', user_data: Any ='', use_internal_label: bool ='', tag: Union[int, str] ='', parent: Union[int, str] ='') -> Union[int, str]:
-	"""Adds a range of font characters to a font."""
-	...
-
-def add_font_range_hint(hint : int, *, label: str ='', user_data: Any ='', use_internal_label: bool ='', tag: Union[int, str] ='', parent: Union[int, str] ='') -> Union[int, str]:
-	"""Adds a range of font characters (mvFontRangeHint_ constants)."""
 	...
 
 def add_font_registry(*, label: str ='', user_data: Any ='', use_internal_label: bool ='', tag: Union[int, str] ='', show: bool ='') -> Union[int, str]:
@@ -679,7 +667,7 @@ def clear_selected_nodes(node_editor : Union[int, str]) -> None:
 	"""Clears a node editor's selected nodes."""
 	...
 
-def configure_app(*, load_init_file: str ='', docking: bool ='', docking_space: bool ='', docking_shift_only: bool ='', init_file: str ='', auto_save_init_file: bool ='', device: int ='', auto_device: bool ='', allow_alias_overwrites: bool ='', manual_alias_management: bool ='', skip_required_args: bool ='', skip_positional_args: bool ='', skip_keyword_args: bool ='', wait_for_input: bool ='', manual_callback_management: bool ='', keyboard_navigation: bool ='', anti_aliased_lines: bool ='', anti_aliased_lines_use_tex: bool ='', anti_aliased_fill: bool ='', **kwargs) -> None:
+def configure_app(*, load_init_file: str ='', docking: bool ='', docking_space: bool ='', docking_shift_only: bool ='', init_file: str ='', auto_save_init_file: bool ='', device: int ='', auto_device: bool ='', allow_alias_overwrites: bool ='', manual_alias_management: bool ='', skip_required_args: bool ='', skip_positional_args: bool ='', skip_keyword_args: bool ='', wait_for_input: bool ='', manual_callback_management: bool ='', keyboard_navigation: bool ='', anti_aliased_lines: bool ='', anti_aliased_lines_use_tex: bool ='', anti_aliased_fill: bool ='', win32_alt_enter_fullscreen: bool ='', **kwargs) -> None:
 	"""Configures app."""
 	...
 
@@ -1569,8 +1557,8 @@ mvThemeCol_Text=0
 mvThemeCol_TextDisabled=0
 mvThemeCol_WindowBg=0
 mvThemeCol_ChildBg=0
-mvThemeCol_Border=0
 mvThemeCol_PopupBg=0
+mvThemeCol_Border=0
 mvThemeCol_BorderShadow=0
 mvThemeCol_FrameBg=0
 mvThemeCol_FrameBgHovered=0
@@ -1598,11 +1586,14 @@ mvThemeCol_SeparatorActive=0
 mvThemeCol_ResizeGrip=0
 mvThemeCol_ResizeGripHovered=0
 mvThemeCol_ResizeGripActive=0
-mvThemeCol_Tab=0
+mvThemeCol_InputTextCursor=0
 mvThemeCol_TabHovered=0
-mvThemeCol_TabActive=0
-mvThemeCol_TabUnfocused=0
-mvThemeCol_TabUnfocusedActive=0
+mvThemeCol_Tab=0
+mvThemeCol_TabSelected=0
+mvThemeCol_TabSelectedOverline=0
+mvThemeCol_TabDimmed=0
+mvThemeCol_TabDimmedSelected=0
+mvThemeCol_TabDimmedSelectedOverline=0
 mvThemeCol_DockingPreview=0
 mvThemeCol_DockingEmptyBg=0
 mvThemeCol_PlotLines=0
@@ -1615,11 +1606,18 @@ mvThemeCol_TableBorderLight=0
 mvThemeCol_TableRowBg=0
 mvThemeCol_TableRowBgAlt=0
 mvThemeCol_TextSelectedBg=0
+mvThemeCol_TreeLines=0
 mvThemeCol_DragDropTarget=0
-mvThemeCol_NavHighlight=0
+mvThemeCol_DragDropTargetBg=0
+mvThemeCol_UnsavedMarker=0
+mvThemeCol_NavCursor=0
 mvThemeCol_NavWindowingHighlight=0
 mvThemeCol_NavWindowingDimBg=0
 mvThemeCol_ModalWindowDimBg=0
+mvThemeCol_TabActive=0
+mvThemeCol_TabUnfocused=0
+mvThemeCol_TabUnfocusedActive=0
+mvThemeCol_NavHighlight=0
 mvPlotCol_Line=0
 mvPlotCol_Fill=0
 mvPlotCol_MarkerOutline=0
@@ -1633,11 +1631,12 @@ mvPlotCol_LegendBorder=0
 mvPlotCol_LegendText=0
 mvPlotCol_TitleText=0
 mvPlotCol_InlayText=0
-mvPlotCol_AxisBg=0
-mvPlotCol_AxisBgActive=0
-mvPlotCol_AxisBgHovered=0
-mvPlotCol_AxisGrid=0
 mvPlotCol_AxisText=0
+mvPlotCol_AxisGrid=0
+mvPlotCol_AxisTick=0
+mvPlotCol_AxisBg=0
+mvPlotCol_AxisBgHovered=0
+mvPlotCol_AxisBgActive=0
 mvPlotCol_Selection=0
 mvPlotCol_Crosshairs=0
 mvNodeCol_NodeBackground=0
@@ -1689,13 +1688,20 @@ mvStyleVar_IndentSpacing=0
 mvStyleVar_CellPadding=0
 mvStyleVar_ScrollbarSize=0
 mvStyleVar_ScrollbarRounding=0
+mvStyleVar_ScrollbarPadding=0
 mvStyleVar_GrabMinSize=0
 mvStyleVar_GrabRounding=0
+mvStyleVar_ImageBorderSize=0
 mvStyleVar_TabRounding=0
 mvStyleVar_TabBorderSize=0
+mvStyleVar_TabMinWidthBase=0
+mvStyleVar_TabMinWidthShrink=0
 mvStyleVar_TabBarBorderSize=0
+mvStyleVar_TabBarOverlineSize=0
 mvStyleVar_TableAngledHeadersAngle=0
 mvStyleVar_TableAngledHeadersTextAlign=0
+mvStyleVar_TreeLinesSize=0
+mvStyleVar_TreeLinesRounding=0
 mvStyleVar_ButtonTextAlign=0
 mvStyleVar_SelectableTextAlign=0
 mvStyleVar_SeparatorTextBorderSize=0
@@ -1883,9 +1889,6 @@ mvTheme=0
 mvThemeColor=0
 mvThemeStyle=0
 mvThemeComponent=0
-mvFontRangeHint=0
-mvFontRange=0
-mvFontChars=0
 mvCharRemap=0
 mvValueRegistry=0
 mvIntValue=0

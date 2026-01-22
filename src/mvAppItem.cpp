@@ -1089,7 +1089,6 @@ DearPyGui::GetEntityTargetSlot(mvAppItemType type)
     switch (type)
     {
     case mvAppItemType::mvFileExtension:
-    case mvAppItemType::mvFontRangeHint:
     case mvAppItemType::mvNodeLink:
     case mvAppItemType::mvAnnotation:
     case mvAppItemType::mvDragLine:
@@ -1494,9 +1493,6 @@ DearPyGui::GetAllowableParents(mvAppItemType type)
         MV_ADD_PARENT(mvAppItemType::mvHandlerRegistry)
         MV_END_PARENTS
 
-    case mvAppItemType::mvFontChars:
-    case mvAppItemType::mvFontRange:
-    case mvAppItemType::mvFontRangeHint:
     case mvAppItemType::mvCharRemap:
         MV_START_PARENTS
         MV_ADD_PARENT(mvAppItemType::mvFont),
@@ -1734,10 +1730,7 @@ DearPyGui::GetAllowableChildren(mvAppItemType type)
 
     case mvAppItemType::mvFont:
         MV_START_CHILDREN
-        MV_ADD_CHILD(mvAppItemType::mvFontChars),
-        MV_ADD_CHILD(mvAppItemType::mvFontRange),
         MV_ADD_CHILD(mvAppItemType::mvCharRemap),
-        MV_ADD_CHILD(mvAppItemType::mvFontRangeHint),
         MV_ADD_CHILD(mvAppItemType::mvTemplateRegistry),
         MV_END_CHILDREN
 
@@ -2082,7 +2075,7 @@ DearPyGui::GetEntityParser(mvAppItemType type)
 
         args.push_back({ mvPyDataType::UUID, "texture_tag", mvArgType::REQUIRED_ARG, "", "The texture_tag should come from a texture that was added to a texture registry." });
         args.push_back({ mvPyDataType::FloatList, "tint_color", mvArgType::KEYWORD_ARG, "(255, 255, 255, 255)", "Applies a color tint to the entire texture." });
-        args.push_back({ mvPyDataType::FloatList, "border_color", mvArgType::KEYWORD_ARG, "(0, 0, 0, 0)", "Displays a border of the specified color around the texture. If the theme style has turned off the border it will not be shown." });
+        args.push_back({ mvPyDataType::FloatList, "border_color", mvArgType::KEYWORD_ARG, "(0, 0, 0, 0)", "Displays a border of the specified color around the texture." });
         args.push_back({ mvPyDataType::FloatList, "uv_min", mvArgType::KEYWORD_ARG, "(0.0, 0.0)", "Normalized texture coordinates min point." });
         args.push_back({ mvPyDataType::FloatList, "uv_max", mvArgType::KEYWORD_ARG, "(1.0, 1.0)", "Normalized texture coordinates max point." });
 
@@ -5117,7 +5110,8 @@ DearPyGui::GetEntityParser(mvAppItemType type)
 
         args.push_back({ mvPyDataType::String, "file" });
         args.push_back({ mvPyDataType::Integer, "size" });
-        args.push_back({ mvPyDataType::Bool, "pixel_snapH", mvArgType::KEYWORD_ARG, "False", "Align every glyph to pixel boundary. Useful e.g. if you are merging a non-pixel aligned font with the default font, or rendering text piece-by-piece (e.g. for coloring)." });
+        args.push_back({ mvPyDataType::Bool, "pixel_snapH", mvArgType::KEYWORD_ARG, "False", "Align every glyph to pixel boundary in horizontal direction. Useful if you are rendering text piece-by-piece (e.g. for coloring)." });
+        args.push_back({ mvPyDataType::Bool, "pixel_snapV", mvArgType::KEYWORD_ARG, "False", "Align scaled GlyphOffset.y to pixel boundaries in ImGui." });
         args.push_back({ mvPyDataType::UUID, "parent", mvArgType::KEYWORD_ARG, "internal_dpg.mvReservedUUID_0", "Parent to add this item to. (runtime adding)" });
         args.push_back({ mvPyDataType::Bool, "default_font", mvArgType::DEPRECATED_REMOVE_KEYWORD_ARG });
 
@@ -5196,46 +5190,6 @@ DearPyGui::GetEntityParser(mvAppItemType type)
         setup.about = "Adds a theme component.";
         setup.category = { "Themes", "Containers" };
         setup.createContextManager = true;
-        break;
-    }
-    case mvAppItemType::mvFontRangeHint:               
-    {
-        AddCommonArgs(args, (CommonParserArgs)(
-            MV_PARSER_ARG_ID |
-            MV_PARSER_ARG_PARENT)
-        );
-
-        args.push_back({ mvPyDataType::Integer, "hint" });
-
-        setup.about = "Adds a range of font characters (mvFontRangeHint_ constants).";
-        setup.category = { "Fonts", "Widgets" };
-        break;
-    }
-    case mvAppItemType::mvFontRange:                   
-    {
-        AddCommonArgs(args, (CommonParserArgs)(
-            MV_PARSER_ARG_ID |
-            MV_PARSER_ARG_PARENT)
-        );
-
-        args.push_back({ mvPyDataType::Integer, "first_char" });
-        args.push_back({ mvPyDataType::Integer, "last_char" });
-
-        setup.about = "Adds a range of font characters to a font.";
-        setup.category = { "Fonts", "Widgets" };
-        break;
-    }
-    case mvAppItemType::mvFontChars:                   
-    {
-        AddCommonArgs(args, (CommonParserArgs)(
-            MV_PARSER_ARG_ID |
-            MV_PARSER_ARG_PARENT)
-        );
-
-        args.push_back({ mvPyDataType::IntList, "chars" });
-
-        setup.about = "Adds specific font characters to a font.";
-        setup.category = { "Fonts", "Widgets" };
         break;
     }
     case mvAppItemType::mvCharRemap:                   
@@ -5694,4 +5648,16 @@ DearPyGui::OnChildRemoved(mvAppItem* item, std::shared_ptr<mvAppItem> child)
         default:
             return;
     }
+}
+
+void
+DearPyGui::RestoreImGuiCursor(const ImVec2& prev_pos)
+{
+    ImGui::SetCursorPos(prev_pos);
+    // Since ImGui 1.92.0, it is necessary to add an item, say a Dummy, if we do
+    // a SetCursorPos at the end of a group or a window (see issue #5548 in Dear ImGui).
+    // To prevent the Dummy from actually moving the cursor, we also zero out item spacing.
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+    ImGui::Dummy(ImVec2(0, 0));
+    ImGui::PopStyleVar();
 }
