@@ -68,10 +68,9 @@ DearPyGui::fill_configuration_dict(const mvChildWindowConfig& inConfig, PyObject
     checkbitset("horizontal_scrollbar", ImGuiWindowFlags_HorizontalScrollbar, inConfig.windowflags);
     checkbitset("menubar", ImGuiWindowFlags_MenuBar, inConfig.windowflags);
     checkbitset("no_scroll_with_mouse", ImGuiWindowFlags_NoScrollWithMouse, inConfig.windowflags);
-    checkbitset("flattened_navigation", ImGuiWindowFlags_NavFlattened, inConfig.windowflags);
 
     // child flags
-    checkbitset("border", ImGuiChildFlags_Border, inConfig.childFlags);
+    checkbitset("border", ImGuiChildFlags_Borders, inConfig.childFlags);
     checkbitset("always_auto_resize", ImGuiChildFlags_AlwaysAutoResize, inConfig.childFlags);
     checkbitset("always_use_window_padding", ImGuiChildFlags_AlwaysUseWindowPadding, inConfig.childFlags);
     checkbitset("auto_resize_x", ImGuiChildFlags_AutoResizeX, inConfig.childFlags);
@@ -79,6 +78,7 @@ DearPyGui::fill_configuration_dict(const mvChildWindowConfig& inConfig, PyObject
     checkbitset("frame_style", ImGuiChildFlags_FrameStyle, inConfig.childFlags);
     checkbitset("resizable_x", ImGuiChildFlags_ResizeX, inConfig.childFlags);
     checkbitset("resizable_y", ImGuiChildFlags_ResizeY, inConfig.childFlags);
+    checkbitset("flattened_navigation", ImGuiChildFlags_NavFlattened, inConfig.childFlags);
 }
 
 void
@@ -125,7 +125,7 @@ DearPyGui::fill_configuration_dict(const mvTreeNodeConfig& inConfig, PyObject* o
     checkbitset("open_on_arrow", ImGuiTreeNodeFlags_OpenOnArrow, inConfig.flags);
     checkbitset("leaf", ImGuiTreeNodeFlags_Leaf, inConfig.flags);
     checkbitset("bullet", ImGuiTreeNodeFlags_Bullet, inConfig.flags);
-    checkbitset("span_text_width", ImGuiTreeNodeFlags_SpanTextWidth, inConfig.flags);
+    checkbitset("span_text_width", ImGuiTreeNodeFlags_SpanLabelWidth, inConfig.flags);
     // checkbitset("span_available_width", ImGuiTreeNodeFlags_SpanAvailWidth, inConfig.flags);
     checkbitset("span_full_width", ImGuiTreeNodeFlags_SpanFullWidth, inConfig.flags);
     // checkbitset("span_all_columns", ImGuiTreeNodeFlags_SpanAllColumns, inConfig.flags);
@@ -274,10 +274,9 @@ DearPyGui::set_configuration(PyObject* inDict, mvChildWindowConfig& outConfig)
     flagop("horizontal_scrollbar", ImGuiWindowFlags_HorizontalScrollbar, outConfig.windowflags);
     flagop("menubar", ImGuiWindowFlags_MenuBar, outConfig.windowflags);
     flagop("no_scroll_with_mouse", ImGuiWindowFlags_NoScrollWithMouse, outConfig.windowflags);
-    flagop("flattened_navigation", ImGuiWindowFlags_NavFlattened, outConfig.windowflags);
 
     // child flags
-    flagop("border", ImGuiChildFlags_Border, outConfig.childFlags);
+    flagop("border", ImGuiChildFlags_Borders, outConfig.childFlags);
     flagop("always_auto_resize", ImGuiChildFlags_AlwaysAutoResize, outConfig.childFlags);
     flagop("always_use_window_padding", ImGuiChildFlags_AlwaysUseWindowPadding, outConfig.childFlags);
     flagop("auto_resize_x", ImGuiChildFlags_AutoResizeX, outConfig.childFlags);
@@ -285,6 +284,7 @@ DearPyGui::set_configuration(PyObject* inDict, mvChildWindowConfig& outConfig)
     flagop("frame_style", ImGuiChildFlags_FrameStyle, outConfig.childFlags);
     flagop("resizable_x", ImGuiChildFlags_ResizeX, outConfig.childFlags);
     flagop("resizable_y", ImGuiChildFlags_ResizeY, outConfig.childFlags);
+    flagop("flattened_navigation", ImGuiChildFlags_NavFlattened, outConfig.childFlags);
 }
 
 void
@@ -338,7 +338,7 @@ DearPyGui::set_configuration(PyObject* inDict, mvTreeNodeConfig& outConfig)
     flagop("open_on_arrow", ImGuiTreeNodeFlags_OpenOnArrow, outConfig.flags);
     flagop("leaf", ImGuiTreeNodeFlags_Leaf, outConfig.flags);
     flagop("bullet", ImGuiTreeNodeFlags_Bullet, outConfig.flags);
-    flagop("span_text_width", ImGuiTreeNodeFlags_SpanTextWidth, outConfig.flags);
+    flagop("span_text_width", ImGuiTreeNodeFlags_SpanLabelWidth, outConfig.flags);
     // flagop("span_available_width", ImGuiTreeNodeFlags_SpanAvailWidth, outConfig.flags);
     flagop("span_full_width", ImGuiTreeNodeFlags_SpanFullWidth, outConfig.flags);
     // flagop("span_all_columns", ImGuiTreeNodeFlags_SpanAllColumns, outConfig.flags);
@@ -620,10 +620,7 @@ DearPyGui::draw_menu(ImDrawList* drawlist, mvAppItem& item, mvMenuConfig& config
 
     // push font if a font object is attached
     if (item.font)
-    {
-        ImFont* fontptr = static_cast<mvFont*>(item.font.get())->getFontPtr();
-        ImGui::PushFont(fontptr);
-    }
+        static_cast<mvFont*>(item.font.get())->pushFont();
 
     // themes
     apply_local_theming(&item);
@@ -699,7 +696,7 @@ DearPyGui::draw_menu(ImDrawList* drawlist, mvAppItem& item, mvMenuConfig& config
 
     // set cursor position to cached position
     if (item.info.dirtyPos)
-        ImGui::SetCursorPos(previousCursorPos);
+        DearPyGui::RestoreImGuiCursor(previousCursorPos);
 
     if (item.config.indent > 0.0f)
         ImGui::Unindent(item.config.indent);
@@ -756,10 +753,7 @@ DearPyGui::draw_tab(ImDrawList* drawlist, mvAppItem& item, mvTabConfig& config)
 
     // push font if a font object is attached
     if (item.font)
-    {
-        ImFont* fontptr = static_cast<mvFont*>(item.font.get())->getFontPtr();
-        ImGui::PushFont(fontptr);
-    }
+        static_cast<mvFont*>(item.font.get())->pushFont();
 
     // themes
     apply_local_theming(&item);
@@ -856,7 +850,7 @@ DearPyGui::draw_tab(ImDrawList* drawlist, mvAppItem& item, mvTabConfig& config)
 
     // set cursor position to cached position
     if (item.info.dirtyPos)
-        ImGui::SetCursorPos(previousCursorPos);
+        DearPyGui::RestoreImGuiCursor(previousCursorPos);
 
     if (item.config.indent > 0.0f)
         ImGui::Unindent(item.config.indent);
@@ -913,10 +907,7 @@ DearPyGui::draw_child_window(ImDrawList* drawlist, mvAppItem& item, mvChildWindo
 
     // push font if a font object is attached
     if (item.font)
-    {
-        ImFont* fontptr = static_cast<mvFont*>(item.font.get())->getFontPtr();
-        ImGui::PushFont(fontptr);
-    }
+        static_cast<mvFont*>(item.font.get())->pushFont();
 
     // themes
     apply_local_theming(&item);
@@ -982,7 +973,7 @@ DearPyGui::draw_child_window(ImDrawList* drawlist, mvAppItem& item, mvChildWindo
 
     // set cursor position to cached position
     if (item.info.dirtyPos)
-        ImGui::SetCursorPos(previousCursorPos);
+        DearPyGui::RestoreImGuiCursor(previousCursorPos);
 
     if (item.config.indent > 0.0f)
         ImGui::Unindent(item.config.indent);
@@ -1039,10 +1030,7 @@ DearPyGui::draw_group(ImDrawList* drawlist, mvAppItem& item, mvGroupConfig& conf
 
     // push font if a font object is attached
     if (item.font)
-    {
-        ImFont* fontptr = static_cast<mvFont*>(item.font.get())->getFontPtr();
-        ImGui::PushFont(fontptr);
-    }
+        static_cast<mvFont*>(item.font.get())->pushFont();
 
     // themes
     apply_local_theming(&item);
@@ -1098,7 +1086,7 @@ DearPyGui::draw_group(ImDrawList* drawlist, mvAppItem& item, mvGroupConfig& conf
 
     // set cursor position to cached position
     if (item.info.dirtyPos)
-        ImGui::SetCursorPos(previousCursorPos);
+        DearPyGui::RestoreImGuiCursor(previousCursorPos);
 
     if (item.config.indent > 0.0f)
         ImGui::Unindent(item.config.indent);
@@ -1197,10 +1185,7 @@ DearPyGui::draw_tree_node(ImDrawList* drawlist, mvAppItem& item, mvTreeNodeConfi
 
     // push font if a font object is attached
     if (item.font)
-    {
-        ImFont* fontptr = static_cast<mvFont*>(item.font.get())->getFontPtr();
-        ImGui::PushFont(fontptr);
-    }
+        static_cast<mvFont*>(item.font.get())->pushFont();
 
     // themes
     apply_local_theming(&item);
@@ -1257,7 +1242,7 @@ DearPyGui::draw_tree_node(ImDrawList* drawlist, mvAppItem& item, mvTreeNodeConfi
 
     // set cursor position to cached position
     if (item.info.dirtyPos)
-        ImGui::SetCursorPos(previousCursorPos);
+        DearPyGui::RestoreImGuiCursor(previousCursorPos);
 
     if (item.config.indent > 0.0f)
         ImGui::Unindent(item.config.indent);
@@ -1351,10 +1336,7 @@ DearPyGui::draw_collapsing_header(ImDrawList* drawlist, mvAppItem& item, mvColla
 
     // push font if a font object is attached
     if (item.font)
-    {
-        ImFont* fontptr = static_cast<mvFont*>(item.font.get())->getFontPtr();
-        ImGui::PushFont(fontptr);
-    }
+        static_cast<mvFont*>(item.font.get())->pushFont();
 
     // themes
     apply_local_theming(&item);
@@ -1399,7 +1381,7 @@ DearPyGui::draw_collapsing_header(ImDrawList* drawlist, mvAppItem& item, mvColla
 
     // set cursor position to cached position
     if (item.info.dirtyPos)
-        ImGui::SetCursorPos(previousCursorPos);
+        DearPyGui::RestoreImGuiCursor(previousCursorPos);
 
     if (item.config.indent > 0.0f)
         ImGui::Unindent(item.config.indent);
@@ -1443,10 +1425,7 @@ DearPyGui::draw_window(ImDrawList* drawlist, mvAppItem& item, mvWindowAppItemCon
 
     // handle fonts
     if (item.font)
-    {
-        ImFont* fontptr = static_cast<mvFont*>(item.font.get())->getFontPtr();
-        ImGui::PushFont(fontptr);
-    }
+        static_cast<mvFont*>(item.font.get())->pushFont();
 
     // themes
     apply_local_theming(&item);
