@@ -6,6 +6,8 @@
 #include "mvToolManager.h"
 #include "mvFontManager.h"
 
+thread_local mvThreadContext mvItemRegistry::threadContext;
+
 mvItemRegistry::mvItemRegistry()
 {
     // We seldom need to do a GetItem(0), and an explicit check for uuid == 0 in GetItem
@@ -30,17 +32,12 @@ DebugItem(const char* label, const char* item) {
     ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "%s", item);
 }
 
-static void
-PushParent(mvItemRegistry& registry, mvAppItem* item)
-{
-    registry.containers.push(item);
-}
-
 static mvAppItem*
 TopParent(mvItemRegistry& registry)
 {
-    if (!registry.containers.empty())
-        return registry.containers.top();
+	auto& containers = mvItemRegistry::threadContext.containers;
+    if (!containers.empty())
+        return containers.top();
     return nullptr;
 }
 
@@ -318,9 +315,10 @@ DeleteItem(mvItemRegistry& registry, mvUUID uuid, b8 childrenOnly, i32 slot)
     }
 
     // See if it is the captured item
-    if (registry.capturedItem && registry.capturedItem.get() == item)
+    auto& capturedItem = mvItemRegistry::threadContext.capturedItem;
+    if (capturedItem && capturedItem.get() == item)
     {
-        registry.capturedItem = nullptr;
+        capturedItem = nullptr;
         return true;
     }
 
@@ -342,10 +340,11 @@ MoveItem(mvItemRegistry& registry, mvUUID uuid, mvUUID parent, mvUUID before)
 
     std::shared_ptr<mvAppItem> child = nullptr;
 
-    if (registry.capturedItem && registry.capturedItem->uuid == uuid)
+    auto& capturedItem = mvItemRegistry::threadContext.capturedItem;
+    if (capturedItem && capturedItem->uuid == uuid)
     {
-        child = registry.capturedItem;
-        registry.capturedItem = nullptr;
+        child = capturedItem;
+        capturedItem = nullptr;
     }
     else
     {
@@ -642,8 +641,9 @@ mvAppItem*
 GetItem(mvItemRegistry& registry, mvUUID uuid)
 {
     // check captured
-    if (registry.capturedItem && registry.capturedItem->uuid == uuid)
-        return registry.capturedItem.get();
+    auto& capturedItem = mvItemRegistry::threadContext.capturedItem;
+    if (capturedItem && capturedItem->uuid == uuid)
+        return capturedItem.get();
 
     auto found = registry.allItems.find(uuid);
     return found != registry.allItems.end()? found->second : nullptr;
@@ -696,16 +696,18 @@ b8
 AddItemWithRuntimeChecks(mvItemRegistry& registry, std::shared_ptr<mvAppItem> item, mvUUID parent, mvUUID before)
 {
 
-    if(registry.captureCallback)
+    auto& threadContext = mvItemRegistry::threadContext;
+
+    if (threadContext.captureCallback)
     {
   
         // this is a unique situation in that the caller always has the GIL
-        registry.capturedItem = item;
+        threadContext.capturedItem = item;
         // resetting captureCallback in advance in order to avoid recursion (if the callback
         // attempts to add another item or move an item)
-        mvPyObject captureCallback(std::move(registry.captureCallback));
-        registry.captureCallback = nullptr;
-        mvRunCallback(captureCallback, nullptr, registry.capturedItem->uuid);
+        mvPyObject captureCallback(std::move(threadContext.captureCallback));
+        threadContext.captureCallback = nullptr;
+        mvRunCallback(captureCallback, nullptr, threadContext.capturedItem->uuid);
         return true;
     }
 
@@ -723,13 +725,13 @@ AddItemWithRuntimeChecks(mvItemRegistry& registry, std::shared_ptr<mvAppItem> it
     //---------------------------------------------------------------------------
     if (DearPyGui::GetEntityDesciptionFlags(item->type) & MV_ITEM_DESC_ROOT)
     {
-        registry.lastRootAdded = item->uuid;
-        registry.lastContainerAdded = item->uuid;
+        threadContext.lastRootAdded = item->uuid;
+        threadContext.lastContainerAdded = item->uuid;
     }
     else if (DearPyGui::GetEntityDesciptionFlags(item->type) & MV_ITEM_DESC_CONTAINER)
-        registry.lastContainerAdded = item->uuid;
+        threadContext.lastContainerAdded = item->uuid;
 
-    registry.lastItemAdded = item->uuid;
+    threadContext.lastItemAdded = item->uuid;
 
     //---------------------------------------------------------------------------
     // STEP 1: check if an item with this name exists (NO LONGER NEEDED)
