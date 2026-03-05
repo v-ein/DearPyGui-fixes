@@ -43,7 +43,7 @@ TopParent(mvItemRegistry& registry)
 {
 	auto& containers = mvItemRegistry::threadContext.containers;
     if (!containers.empty())
-        return containers.top();
+        return containers.top().get();
     return nullptr;
 }
 
