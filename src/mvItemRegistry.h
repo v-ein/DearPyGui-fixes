@@ -60,7 +60,7 @@ struct mvThreadContext
     mvUUID     lastContainerAdded = 0;
     mvUUID     lastRootAdded = 0;
 
-    std::stack<mvAppItem*>                  containers;      // parent stack, top of stack becomes widget's parent
+    std::stack<std::shared_ptr<mvAppItem>>  containers;      // parent stack, top of stack becomes widget's parent
 
     std::shared_ptr<mvAppItem>              capturedItem = nullptr;
     mvPyObject                              captureCallback = nullptr;

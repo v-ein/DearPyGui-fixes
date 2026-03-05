@@ -2933,10 +2933,10 @@ pop_container_stack(PyObject* self, PyObject* args, PyObject* kwargs)
 		return nullptr;
 	}
 
-	mvAppItem* item = containers.top();
+	PyObject* top = ToPyUUIDOrNone(containers.top().get());
 	containers.pop();
 
-	return ToPyUUIDOrNone(item);
+	return top;
 
 }
 
@@ -2958,7 +2958,7 @@ top_container_stack(PyObject* self, PyObject* args, PyObject* kwargs)
 	mvAppItem* item = nullptr;
 	auto& containers = mvItemRegistry::threadContext.containers;
 	if (!containers.empty())
-		item = containers.top();
+		item = containers.top().get();
 
 	return ToPyUUIDOrNone(item);
 }
@@ -2999,7 +2999,7 @@ push_container_stack(PyObject* self, PyObject* args, PyObject* kwargs)
 
 	mvUUID item = GetIDFromPyObject(itemraw);
 
-	mvAppItem* parent = GetItem((*GContext->itemRegistry), item);
+	auto parent = GetRefItem((*GContext->itemRegistry), item);
 	if (parent)
 	{
 		if (DearPyGui::GetEntityDesciptionFlags(parent->type) & MV_ITEM_DESC_CONTAINER)
