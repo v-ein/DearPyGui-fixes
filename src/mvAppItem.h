@@ -56,7 +56,7 @@ enum ItemDescriptionFlags
 enum class mvLibType
 {
     MV_IMGUI = 0,
-    OT = 1,
+    MV_IMPLOT = 1,
     MV_IMNODES = 2
 };
 

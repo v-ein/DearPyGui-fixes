@@ -246,7 +246,7 @@ def show_demo():
 
                     with dpg.child_window(height=60, autosize_x=True):
                         for i in range(10):
-                            dpg.add_text(f"Scolling Text{i}")
+                            dpg.add_text(f"Scrolling Text{i}")
 
                     dpg.add_slider_float(label="Slider Float")
                     dpg.add_input_int(label="Input Int")
