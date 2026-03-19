@@ -142,7 +142,7 @@ PyObject*   GetPyNoneOrError ();
 PyObject*   ToPyUUID  (mvUUID uuid, const std::string& alias);
 
 // Returns item UUID or alias, or zero if `item` is null.  An valid item can never
-// a UUID of zero, so it is a good value to designate a "no item" case (also can
+// have a UUID of zero, so it is a good value to designate a "no item" case (also can
 // easily be checked with `if (item)` in Python).
 PyObject*   ToPyUUID  (mvAppItem* item);
 

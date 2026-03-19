@@ -80,7 +80,6 @@ def start_dearpygui():
 
     if not internal_dpg.is_viewport_ok():
         raise RuntimeError("Viewport was not created and shown.")
-        return
 
     while(internal_dpg.is_dearpygui_running()):
         internal_dpg.render_dearpygui_frame()   
