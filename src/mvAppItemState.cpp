@@ -26,7 +26,7 @@ ResetAppItemState(mvAppItemState& state)
     state.activated = false;
     state.deactivated = false;
     state.deactivatedAfterEdit = false;
-    state.toggledOpen = false;
+    state.toggledOpenPure = state.toggledOpen = false;
     state.mvRectSizeResized = false;
     state.scrolledX = state.scrolledY = false;
     state.isScrollingX = state.isScrollingY = false;
@@ -57,7 +57,7 @@ UpdateAppItemState(mvAppItemState& state)
     state.activated = ImGui::IsItemActivated();
     state.deactivated = ImGui::IsItemDeactivated();
     state.deactivatedAfterEdit = ImGui::IsItemDeactivatedAfterEdit();
-    state.toggledOpen = ImGui::IsItemToggledOpen();
+    state.toggledOpenPure = state.toggledOpen = ImGui::IsItemToggledOpen();
     state.rectMin = { ImGui::GetItemRectMin().x, ImGui::GetItemRectMin().y };
     state.rectMax = { ImGui::GetItemRectMax().x, ImGui::GetItemRectMax().y };
     state.rectSize = { ImGui::GetItemRectSize().x, ImGui::GetItemRectSize().y };

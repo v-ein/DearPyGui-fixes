@@ -5066,6 +5066,8 @@ DearPyGui::GetEntityParser(mvAppItemType type)
             MV_PARSER_ARG_CALLBACK)
         );
 
+        args.push_back({ mvPyDataType::Bool, "two_way", mvArgType::KEYWORD_ARG, "False", "Trigger on both 'opened' and 'closed' events, i.e. when the 'opened' state is toggled between the two values. If False, some containers will trigger it only on the 'opened' event." });
+
         setup.about = "Adds a togged open handler.";
         setup.category = { "Widgets", "Events" };
         break;

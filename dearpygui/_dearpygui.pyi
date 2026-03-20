@@ -335,7 +335,7 @@ def add_item_scroll_handler(*, label: str ='', user_data: Any ='', use_internal_
 	"""Adds a scroll handler."""
 	...
 
-def add_item_toggled_open_handler(*, label: str ='', user_data: Any ='', use_internal_label: bool ='', tag: Union[int, str] ='', parent: Union[int, str] ='', callback: Callable ='', show: bool ='') -> Union[int, str]:
+def add_item_toggled_open_handler(*, label: str ='', user_data: Any ='', use_internal_label: bool ='', tag: Union[int, str] ='', parent: Union[int, str] ='', callback: Callable ='', show: bool ='', two_way: bool ='') -> Union[int, str]:
 	"""Adds a togged open handler."""
 	...
 

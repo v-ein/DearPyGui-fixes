@@ -85,6 +85,10 @@ struct mvAppItemState
     b8         deactivated          = false;
     b8         deactivatedAfterEdit = false;
     b8         toggledOpen          = false;
+    // This one is not reset by mvCollapsingHeader and mvTreeNode; also, not all items
+    // initialize it (but mvCollapsingHeader and mvTreeNode do, and they in fact are
+    // the only ones that must do it).  Used as an extra flag by the two-way toggled open handler.
+    b8         toggledOpenPure      = false;
     b8         mvRectSizeResized    = false;
     b8         scrolledX            = false;
     b8         scrolledY            = false;

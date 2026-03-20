@@ -96,7 +96,6 @@ def start_dearpygui():
 
     if not internal_dpg.is_viewport_ok():
         raise RuntimeError("Viewport was not created and shown.")
-        return
 
     while(internal_dpg.is_dearpygui_running()):
         internal_dpg.render_dearpygui_frame()   
@@ -5694,7 +5693,7 @@ def add_item_scroll_handler(*, label: str =None, user_data: Any =None, use_inter
 
 	return internal_dpg.add_item_scroll_handler(label=label, user_data=user_data, use_internal_label=use_internal_label, tag=tag, parent=parent, callback=callback, show=show, **kwargs)
 
-def add_item_toggled_open_handler(*, label: str =None, user_data: Any =None, use_internal_label: bool =True, tag: Union[int, str] =0, parent: Union[int, str] =0, callback: Callable =None, show: bool =True, **kwargs) -> Union[int, str]:
+def add_item_toggled_open_handler(*, label: str =None, user_data: Any =None, use_internal_label: bool =True, tag: Union[int, str] =0, parent: Union[int, str] =0, callback: Callable =None, show: bool =True, two_way: bool =False, **kwargs) -> Union[int, str]:
 	"""	 Adds a togged open handler.
 
 	Args:
@@ -5705,6 +5704,7 @@ def add_item_toggled_open_handler(*, label: str =None, user_data: Any =None, use
 		parent (Union[int, str], optional): Parent to add this item to. (runtime adding)
 		callback (Callable, optional): Registers a callback.
 		show (bool, optional): Attempt to render widget.
+		two_way (bool, optional): Trigger on both 'opened' and 'closed' events, i.e. when the 'opened' state is toggled between the two values. If False, some containers will trigger it only on the 'opened' event.
 		id (Union[int, str], optional): (deprecated) 
 	Returns:
 		Union[int, str]
@@ -5714,7 +5714,7 @@ def add_item_toggled_open_handler(*, label: str =None, user_data: Any =None, use
 		warnings.warn('id keyword renamed to tag', DeprecationWarning, 2)
 		tag=kwargs['id']
 
-	return internal_dpg.add_item_toggled_open_handler(label=label, user_data=user_data, use_internal_label=use_internal_label, tag=tag, parent=parent, callback=callback, show=show, **kwargs)
+	return internal_dpg.add_item_toggled_open_handler(label=label, user_data=user_data, use_internal_label=use_internal_label, tag=tag, parent=parent, callback=callback, show=show, two_way=two_way, **kwargs)
 
 def add_item_visible_handler(*, label: str =None, user_data: Any =None, use_internal_label: bool =True, tag: Union[int, str] =0, parent: Union[int, str] =0, callback: Callable =None, show: bool =True, **kwargs) -> Union[int, str]:
 	"""	 Adds a visible handler.
