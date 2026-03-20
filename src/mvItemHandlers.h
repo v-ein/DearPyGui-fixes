@@ -149,6 +149,11 @@ public:
     explicit mvToggledOpenHandler(mvUUID uuid) : mvItemHandler(uuid) {}
     void draw(ImDrawList* drawlist, float x, float y) override {}
     void customAction(void* data = nullptr) override;
+    void handleSpecificKeywordArgs(PyObject* dict) override;
+    void getSpecificConfiguration(PyObject* dict) override;
+
+private:
+    bool twoWay = false;
 };
 
 class mvVisibleHandler : public mvItemHandler

@@ -343,10 +343,26 @@ void mvResizeHandler::customAction(void* data)
 void mvToggledOpenHandler::customAction(void* data)
 {
 	mvAppItemState* state = static_cast<mvAppItemState*>(data);
-	if (state->toggledOpen)
+	if (state->toggledOpen || twoWay && state->toggledOpenPure)
 	{
 		submitHandler(state->parent);
 	}
+}
+
+void mvToggledOpenHandler::handleSpecificKeywordArgs(PyObject* dict)
+{
+	if (dict == nullptr)
+		return;
+
+	if (PyObject* item = PyDict_GetItemString(dict, "two_way")) twoWay = ToBool(item);
+}
+
+void mvToggledOpenHandler::getSpecificConfiguration(PyObject* dict)
+{
+	if (dict == nullptr)
+		return;
+
+	PyDict_SetItemString(dict, "two_way", mvPyObject(ToPyBool(twoWay)));
 }
 
 void mvVisibleHandler::customAction(void* data)
