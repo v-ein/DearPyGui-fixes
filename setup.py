@@ -133,6 +133,7 @@ def setup_package():
 
     shutil.copy(src_path + "/dearpygui/demo.py", src_path + "/output/dearpygui")
     shutil.copy(src_path + "/dearpygui/experimental.py", src_path + "/output/dearpygui")
+    shutil.copy(src_path + "/dearpygui/type_info.py", src_path + "/output/dearpygui")
 
     with open(src_path + "/output/dearpygui/__init__.py", 'w') as file:
         file.write("__version__='" + version_number() + "'\n")
@@ -205,9 +206,9 @@ def setup_package():
     if os.environ.get('READTHEDOCS') == 'True':
         metadata['package_data']['dearpygui'] = ["__init__.py", "_dearpygui.py", "dearpygui.py", "demo.py", "experimental.py"]
     elif get_platform() == "Windows":
-        metadata['package_data']['dearpygui'] = ["__init__.py", "_dearpygui.so", "_dearpygui.pyd", "_dearpygui.pyi", "dearpygui.py", "demo.py", "experimental.py", "vcruntime140_1.dll"]
+        metadata['package_data']['dearpygui'] = ["__init__.py", "_dearpygui.so", "_dearpygui.pyd", "_dearpygui.pyi", "dearpygui.py", "demo.py", "experimental.py", "type_info.py", "vcruntime140_1.dll"]
     else:
-        metadata['package_data']['dearpygui'] = ["__init__.py", "_dearpygui.so", "_dearpygui.pyd", "_dearpygui.pyi", "dearpygui.py", "demo.py", "experimental.py"]
+        metadata['package_data']['dearpygui'] = ["__init__.py", "_dearpygui.so", "_dearpygui.pyd", "_dearpygui.pyi", "dearpygui.py", "demo.py", "experimental.py", "type_info.py"]
 
     if "--force" in sys.argv:
         sys.argv.remove('--force')
