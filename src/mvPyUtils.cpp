@@ -2997,38 +2997,72 @@ GenerateTypeInfoModule(const std::string& directory)
     stub << "    ]\n\n";
 
 
-    stub << "def get_allowed_parents(**kwargs) -> dict:\n"
-            "    \"\"\" Return all item type names and collections of applicable parenting types as a mapping.\"\"\"\n\n"
+    stub << "def get_allowed_parents(distinct_allow_all: bool = False, **kwargs) -> dict:\n"
+            "    \"\"\" Return all item type names and collections of applicable parenting types as a mapping.\n\n"
+            "    Args:\n"
+            "        distinct_allow_all (bool):     If set to True, entries for the items accepted by any parent will be set to None.  "
+            "This allows to detect and handle such cases specially if needed.  "
+            "If False, all item types will be listed explicitly in such entries, which allows more straightforward processing of the dict.\n"
+            "    Returns:\n"
+            "        dict\n"
+            "    \"\"\"\n\n"
+            "    all_types = None if distinct_allow_all else get_all_types()\n\n"
             "    return {\n";
+
+
 
     for (const auto& entry : name_type_pairs)
     {
-        stub << "        \"mvAppItemType::" << entry.first << "\": [";
+        stub << "        \"mvAppItemType::" << entry.first << "\": ";
 
         auto name_id_pairs = DearPyGui::GetAllowableParents(entry.second);
-        for (const auto& name_id_pair : name_id_pairs)
+        if (!name_id_pairs.empty() && name_id_pairs[0].first == "All")
         {
-            stub << "\"" << name_id_pair.first << "\", ";
+            stub << "all_types,\n";
         }
-        stub << "],\n";
+        else
+        {
+            stub << "[";
+            for (const auto& name_id_pair : name_id_pairs)
+            {
+                stub << "\"" << name_id_pair.first << "\", ";
+            }
+            stub << "],\n";
+        }
     }
     stub << "    }\n\n";
 
 
-    stub << "def get_allowed_children(**kwargs) -> dict:\n"
-            "    \"\"\" Return all item type names and collections of applicable child types as a mapping.\"\"\"\n\n"
+    stub << "def get_allowed_children(distinct_allow_all: bool = False, **kwargs) -> dict:\n"
+            "    \"\"\" Return all item type names and collections of applicable child types as a mapping.\n\n"
+            "    Args:\n"
+            "        distinct_allow_all (bool):     If set to True, entries for the items accepting all children types will be set to None.  "
+            "This allows to detect and handle such cases specially if needed.  "
+            "If False, all item types will be listed explicitly in such entries, which allows more straightforward processing of the dict.\n"
+            "    Returns:\n"
+            "        dict\n"
+            "    \"\"\"\n\n"
+            "    all_types = None if distinct_allow_all else get_all_types()\n\n"
             "    return {\n";
 
     for (const auto& entry : name_type_pairs)
     {
-        stub << "        \"mvAppItemType::" << entry.first << "\": [";
+        stub << "        \"mvAppItemType::" << entry.first << "\": ";
 
         auto name_id_pairs = DearPyGui::GetAllowableChildren(entry.second);
-        for (const auto& name_id_pair : name_id_pairs)
+        if (!name_id_pairs.empty() && name_id_pairs[0].first == "All")
         {
-            stub << "\"" << name_id_pair.first << "\", ";
+            stub << "all_types,\n";
         }
-        stub << "],\n";
+        else
+        {
+            stub << "[";
+            for (const auto& name_id_pair : name_id_pairs)
+            {
+                stub << "\"" << name_id_pair.first << "\", ";
+            }
+            stub << "],\n";
+        }
     }
     stub << "    }\n\n";
 
