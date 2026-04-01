@@ -2986,6 +2986,10 @@ GenerateTypeInfoModule(const std::string& directory)
     #undef X
 
 
+    //-----------------------------------------------------------------------------
+    // get_all_types
+    //-----------------------------------------------------------------------------
+
     stub << "def get_all_types(**kwargs) -> list:\n"
             "    \"\"\" Return names of all item types as a list.\"\"\"\n\n"
             "    return [\n";
@@ -2997,8 +3001,15 @@ GenerateTypeInfoModule(const std::string& directory)
     stub << "    ]\n\n";
 
 
+    //-----------------------------------------------------------------------------
+    // get_allowed_parents, get_allowed_children
+    //-----------------------------------------------------------------------------
+
     stub << "def get_allowed_parents(distinct_allow_all: bool = False, **kwargs) -> dict:\n"
             "    \"\"\" Return all item type names and collections of applicable parenting types as a mapping.\n\n"
+            "    This function returns the set of rules defined defined within Dear PyGui.  At runtime, these rules "
+            "are combined with those from `get_allowed_children()`, and what is allowed here might be disabled there.  "
+            "To get the actual possible combinations of chilren and parent types, see `get_possible_parents()` and `get_possible_children()`.\n\n"
             "    Args:\n"
             "        distinct_allow_all (bool):     If set to True, entries for the items accepted by any parent will be set to None.  "
             "This allows to detect and handle such cases specially if needed.  "
@@ -3006,7 +3017,7 @@ GenerateTypeInfoModule(const std::string& directory)
             "    Returns:\n"
             "        dict\n"
             "    \"\"\"\n\n"
-            "    all_types = None if distinct_allow_all else get_all_types()\n\n"
+            "    all_types = None if distinct_allow_all else tuple(get_all_types())\n\n"
             "    return {\n";
 
 
@@ -3016,18 +3027,18 @@ GenerateTypeInfoModule(const std::string& directory)
         stub << "        \"mvAppItemType::" << entry.first << "\": ";
 
         auto name_id_pairs = DearPyGui::GetAllowableParents(entry.second);
-        if (!name_id_pairs.empty() && name_id_pairs[0].first == "All")
+        if (!name_id_pairs.empty() && name_id_pairs[0].second == (i32)mvAppItemType::All)
         {
             stub << "all_types,\n";
         }
         else
         {
-            stub << "[";
+            stub << "(";
             for (const auto& name_id_pair : name_id_pairs)
             {
                 stub << "\"" << name_id_pair.first << "\", ";
             }
-            stub << "],\n";
+            stub << "),\n";
         }
     }
     stub << "    }\n\n";
@@ -3035,6 +3046,9 @@ GenerateTypeInfoModule(const std::string& directory)
 
     stub << "def get_allowed_children(distinct_allow_all: bool = False, **kwargs) -> dict:\n"
             "    \"\"\" Return all item type names and collections of applicable child types as a mapping.\n\n"
+            "    This function returns the set of rules defined defined within Dear PyGui.  At runtime, these rules "
+            "are combined with those from `get_allowed_parents()`, and what is allowed here might be disabled there.  "
+            "To get the actual possible combinations of chilren and parent types, see `get_possible_parents()` and `get_possible_children()`.\n\n"
             "    Args:\n"
             "        distinct_allow_all (bool):     If set to True, entries for the items accepting all children types will be set to None.  "
             "This allows to detect and handle such cases specially if needed.  "
@@ -3042,7 +3056,7 @@ GenerateTypeInfoModule(const std::string& directory)
             "    Returns:\n"
             "        dict\n"
             "    \"\"\"\n\n"
-            "    all_types = None if distinct_allow_all else get_all_types()\n\n"
+            "    all_types = None if distinct_allow_all else tuple(get_all_types())\n\n"
             "    return {\n";
 
     for (const auto& entry : name_type_pairs)
@@ -3050,22 +3064,139 @@ GenerateTypeInfoModule(const std::string& directory)
         stub << "        \"mvAppItemType::" << entry.first << "\": ";
 
         auto name_id_pairs = DearPyGui::GetAllowableChildren(entry.second);
-        if (!name_id_pairs.empty() && name_id_pairs[0].first == "All")
+        if (!name_id_pairs.empty() && name_id_pairs[0].second == (i32)mvAppItemType::All)
         {
             stub << "all_types,\n";
         }
         else
         {
-            stub << "[";
+            stub << "(";
             for (const auto& name_id_pair : name_id_pairs)
             {
                 stub << "\"" << name_id_pair.first << "\", ";
             }
-            stub << "],\n";
+            stub << "),\n";
         }
     }
     stub << "    }\n\n";
 
+
+    //-----------------------------------------------------------------------------
+    // get_possible_parents, get_possible_children
+    //-----------------------------------------------------------------------------
+
+    // This array will contain all possible parent-child relationships.  Initialized to all-false.
+    // Note: the code below expects `mvAppItemType::All` to have a value of zero!  All those
+    // loop counters starting at 1 are caused by this.  If the value of `mvAppItemType::All` ever
+    // changes to something different, the code needs to be adjusted to explicitly check for
+    // equality to `mvAppItemType::All` in various places.
+    const size_t types_count = (size_t)mvAppItemType::ItemTypeCount;
+    bool relations[types_count][types_count] = {};
+
+    // Fill in by parents
+    for (const auto& entry : name_type_pairs)
+    {
+        auto name_id_pairs = DearPyGui::GetAllowableParents(entry.second);
+        size_t child = (size_t)entry.second;
+        if (!name_id_pairs.empty() && name_id_pairs[0].second == (i32)mvAppItemType::All)
+        {
+            for (size_t i = 1; i < types_count; i++)
+                relations[i][child] = true;
+        }
+        else
+        {
+            for (const auto& name_id_pair : name_id_pairs)
+                relations[(size_t)name_id_pair.second][child] = true;
+        }
+    }
+
+    // Now mask them by allowed children
+    for (const auto& entry : name_type_pairs)
+    {
+        size_t parent = (size_t)entry.second;
+        // Make sure it can have any children at all
+        if (DearPyGui::GetEntityDesciptionFlags(entry.second) & MV_ITEM_DESC_CONTAINER)
+        {
+            auto name_id_pairs = DearPyGui::GetAllowableChildren(entry.second);
+            bool allow_all = !name_id_pairs.empty() && name_id_pairs[0].second == (i32)mvAppItemType::All;
+            // If all children are allowed, we don't need to make any changes to the already filled line.
+            if (!allow_all)
+            {
+                bool children[types_count] = {};
+                for (const auto& name_id_pair : name_id_pairs)
+                    children[(size_t)name_id_pair.second] = true;
+
+                for (size_t i = 1; i < types_count; i++)
+                    relations[parent][i] = relations[parent][i] && children[i];
+            }
+        }
+        else
+        {
+            // Not a container? Kill all children.
+            for (size_t i = 1; i < types_count; i++)
+                relations[parent][i] = false;
+        }
+    }
+
+    // Write out the resulting set of relationships
+
+    stub << "def get_possible_parents(**kwargs) -> dict:\n"
+            "    \"\"\" Return a dict that for every item type lists all types that can be used as a parent.\n\n"
+            "    Unlike `get_allowed_parents()`, this function returns the actual set of all possible "
+            "parent-child relationthips that results from applying *both* `get_allowed_parents()` "
+            "and `get_allowed_children()`, represented as a child-to-parents map.  "
+            "It also takes `is_container()` into account.\n"
+            "    \"\"\"\n\n"
+            "    return {\n";
+
+    for (const auto& entry : name_type_pairs)
+    {
+        stub << "        \"mvAppItemType::" << entry.first << "\": ";
+
+        size_t child = (size_t)entry.second;
+        stub << "(";
+        for (size_t i = 1; i < types_count; i++)
+        {
+            if (relations[i][child])
+            {
+                stub << "\"" << DearPyGui::GetEntityTypeString((mvAppItemType)i) << "\", ";
+            }
+        }
+        stub << "),\n";
+    }
+    stub << "    }\n\n";
+
+
+    stub << "def get_possible_children(**kwargs) -> dict:\n"
+            "    \"\"\" Return a dict that for every item type lists all types that can be used for a child item.\n\n"
+            "    Unlike `get_allowed_children()`, this function returns the actual set of all possible "
+            "parent-child relationthips that results from applying *both* `get_allowed_parents()` "
+            "and `get_allowed_children()`, represented as a parent-to-children map.  "
+            "It also takes `is_container()` into account.\n"
+            "    \"\"\"\n\n"
+            "    return {\n";
+
+    for (const auto& entry : name_type_pairs)
+    {
+        stub << "        \"mvAppItemType::" << entry.first << "\": ";
+
+        size_t parent = (size_t)entry.second;
+        stub << "(";
+        for (size_t i = 1; i < types_count; i++)
+        {
+            if (relations[parent][i])
+            {
+                stub << "\"" << DearPyGui::GetEntityTypeString((mvAppItemType)i) << "\", ";
+            }
+        }
+        stub << "),\n";
+    }
+    stub << "    }\n\n";
+
+
+    //-----------------------------------------------------------------------------
+    // get_item_type_commands
+    //-----------------------------------------------------------------------------
 
     stub << "def get_item_type_commands(**kwargs) -> dict:\n"
             "    \"\"\" Return the names of item types and their associated functions as a mapping.\"\"\"\n\n"
@@ -3077,6 +3208,10 @@ GenerateTypeInfoModule(const std::string& directory)
     }
     stub << "    }\n\n";
 
+
+    //-----------------------------------------------------------------------------
+    // is_container, is_root
+    //-----------------------------------------------------------------------------
 
     stub << "CONTAINERS = frozenset((\n";
     for (const auto& entry : name_type_pairs)
@@ -3113,6 +3248,10 @@ GenerateTypeInfoModule(const std::string& directory)
             "    \"\"\"\n\n"
             "    return item_type in ROOTS\n\n";
 
+
+    //-----------------------------------------------------------------------------
+    // get_applicable_states
+    //-----------------------------------------------------------------------------
 
     stub << "def get_applicable_states(**kwargs) -> dict:\n"
             "    \"\"\" Return all item type names and collections of applicable child types as a mapping.\"\"\"\n\n"
