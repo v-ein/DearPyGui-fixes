@@ -3020,8 +3020,6 @@ GenerateTypeInfoModule(const std::string& directory)
             "    all_types = None if distinct_allow_all else tuple(get_all_types())\n\n"
             "    return {\n";
 
-
-
     for (const auto& entry : name_type_pairs)
     {
         stub << "        \"mvAppItemType::" << entry.first << "\": ";
@@ -3146,23 +3144,57 @@ GenerateTypeInfoModule(const std::string& directory)
             "parent-child relationthips that results from applying *both* `get_allowed_parents()` "
             "and `get_allowed_children()`, represented as a child-to-parents map.  "
             "It also takes `is_container()` into account.\n"
-            "    \"\"\"\n\n"
-            "    return {\n";
+            "    \"\"\"\n\n";
+
+    // Since many entries in the resulting dict basically share the same sets of values,
+    // we want to optimize that a bit.  The resulting code may look more entangled but
+    // should be more efficient both in terms of memory use and load time (we'll better
+    // spend time now than on application startup!).
+    std::vector<std::array<bool, types_count>> subsets;
+    size_t indices[types_count];
+    for (const auto& entry : name_type_pairs)
+    {
+        size_t child = (size_t)entry.second;
+        // Searching for an existing subset.  Yes, it's an O(n^2), but this runs at
+        // build time so we can afford it for the sake of simplicity.
+        size_t subset_idx = 0;
+        for (; subset_idx < subsets.size(); ++subset_idx)
+        {
+            auto& subset = subsets[subset_idx];
+            size_t i = 1;
+            for (; i < types_count; i++)
+            {
+                if (relations[i][child] != subset[i])
+                    break;
+            }
+            // See if a matching line is found
+            if (i >= types_count)
+                break;
+        }
+        // Line found?
+        if (subset_idx >= subsets.size())
+        {
+            // Add a new entry
+            subsets.emplace_back();
+            auto& subset = subsets[subset_idx];
+
+            stub << "    set" << subset_idx << " = (";
+            for (size_t i = 1; i < types_count; i++)
+            {
+                subset[i] = relations[i][child];
+                if (subset[i])
+                    stub << "\"" << DearPyGui::GetEntityTypeString((mvAppItemType)i) << "\", ";
+            }
+            stub << ")\n";
+        }
+        indices[child] = subset_idx;
+    }
+
+    stub << "\n    return {\n";
 
     for (const auto& entry : name_type_pairs)
     {
-        stub << "        \"mvAppItemType::" << entry.first << "\": ";
-
-        size_t child = (size_t)entry.second;
-        stub << "(";
-        for (size_t i = 1; i < types_count; i++)
-        {
-            if (relations[i][child])
-            {
-                stub << "\"" << DearPyGui::GetEntityTypeString((mvAppItemType)i) << "\", ";
-            }
-        }
-        stub << "),\n";
+        stub << "        \"mvAppItemType::" << entry.first << "\": set" << indices[(size_t)entry.second] << ",\n";
     }
     stub << "    }\n\n";
 
@@ -3173,23 +3205,47 @@ GenerateTypeInfoModule(const std::string& directory)
             "parent-child relationthips that results from applying *both* `get_allowed_parents()` "
             "and `get_allowed_children()`, represented as a parent-to-children map.  "
             "It also takes `is_container()` into account.\n"
-            "    \"\"\"\n\n"
-            "    return {\n";
+            "    \"\"\"\n\n";
+
+    // We're doing the same optimization here as for get_possible_parents.
+    subsets.clear();
+    for (const auto& entry : name_type_pairs)
+    {
+        size_t parent = (size_t)entry.second;
+        // Searching for an existing subset.  Yes, it's an O(n^2), but this runs at
+        // build time so we can afford it for the sake of simplicity.
+        size_t subset_idx = 0;
+        for (; subset_idx < subsets.size(); ++subset_idx)
+        {
+            auto& subset = subsets[subset_idx];
+            // See if a matching line is found
+            if (std::equal(std::begin(subset), std::end(subset), std::begin(relations[parent])))
+                break;
+        }
+        // Line found?
+        if (subset_idx >= subsets.size())
+        {
+            // Add a new entry
+            subsets.emplace_back();
+            auto& subset = subsets[subset_idx];
+            std::copy(std::begin(relations[parent]), std::end(relations[parent]), std::begin(subset));
+
+            stub << "    set" << subset_idx << " = (";
+            for (size_t i = 1; i < types_count; i++)
+            {
+                if (subset[i])
+                    stub << "\"" << DearPyGui::GetEntityTypeString((mvAppItemType)i) << "\", ";
+            }
+            stub << ")\n";
+        }
+        indices[parent] = subset_idx;
+    }
+
+    stub << "\n    return {\n";
 
     for (const auto& entry : name_type_pairs)
     {
-        stub << "        \"mvAppItemType::" << entry.first << "\": ";
-
-        size_t parent = (size_t)entry.second;
-        stub << "(";
-        for (size_t i = 1; i < types_count; i++)
-        {
-            if (relations[parent][i])
-            {
-                stub << "\"" << DearPyGui::GetEntityTypeString((mvAppItemType)i) << "\", ";
-            }
-        }
-        stub << "),\n";
+        stub << "        \"mvAppItemType::" << entry.first << "\": set" << indices[(size_t)entry.second] << ",\n";
     }
     stub << "    }\n\n";
 
