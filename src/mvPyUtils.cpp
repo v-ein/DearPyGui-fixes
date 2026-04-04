@@ -3007,8 +3007,8 @@ GenerateTypeInfoModule(const std::string& directory)
 
     stub << "def get_allowed_parents(distinct_allow_all: bool = False, **kwargs) -> dict:\n"
             "    \"\"\" Return all item type names and collections of applicable parenting types as a mapping.\n\n"
-            "    This function returns the set of rules defined defined within Dear PyGui.  At runtime, these rules "
-            "are combined with those from `get_allowed_children()`, and what is allowed here might be disabled there.  "
+            "    This function returns a set of rules defined within Dear PyGui.  At runtime, these rules "
+            "get combined with those from `get_allowed_children()`, and what is allowed here might be disabled there.  "
             "To get the actual possible combinations of chilren and parent types, see `get_possible_parents()` and `get_possible_children()`.\n\n"
             "    Args:\n"
             "        distinct_allow_all (bool):     If set to True, entries for the items accepted by any parent will be set to None.  "
@@ -3044,8 +3044,8 @@ GenerateTypeInfoModule(const std::string& directory)
 
     stub << "def get_allowed_children(distinct_allow_all: bool = False, **kwargs) -> dict:\n"
             "    \"\"\" Return all item type names and collections of applicable child types as a mapping.\n\n"
-            "    This function returns the set of rules defined defined within Dear PyGui.  At runtime, these rules "
-            "are combined with those from `get_allowed_parents()`, and what is allowed here might be disabled there.  "
+            "    This function returns a set of rules defined within Dear PyGui.  At runtime, these rules "
+            "get combined with those from `get_allowed_parents()`, and what is allowed here might be disabled there.  "
             "To get the actual possible combinations of chilren and parent types, see `get_possible_parents()` and `get_possible_children()`.\n\n"
             "    Args:\n"
             "        distinct_allow_all (bool):     If set to True, entries for the items accepting all children types will be set to None.  "
