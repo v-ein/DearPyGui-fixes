@@ -3976,15 +3976,67 @@ DearPyGui::draw_listbox(ImDrawList *drawlist, mvAppItem &item, mvListboxConfig &
             config.disabledindex = config.index;
         }
 
+        item.handleImmediateScroll();
+
         // remap Header to FrameBgActive
         ImGuiStyle* style = &ImGui::GetStyle();
         ImGui::PushStyleColor(ImGuiCol_Header, style->Colors[ImGuiCol_FrameBgActive]);
 
-        if (ImGui::ListBox(item.info.internalLabel.c_str(), item.config.enabled ? &config.index : &config.disabledindex, config.charNames.data(), (int)config.names.size(), config.itemsHeight))
+        // We cannot use `ImGui::ListBox()` directly because to apply scrolling,
+        // we need access to the child window and `ListBox()` does not expose it.
+        // That's why we have to reimplement it using BeginListBox/EndListBox
+        // (as ImGui recommends it anyway).  Ideally, the code below needs to be
+        // kept in sync, more or less, with `ImGui::ListBox()`.
+        int items_count = (int)config.names.size();
+        int* current_item = item.config.enabled ? &config.index : &config.disabledindex;
+
+        int height_in_items = config.itemsHeight;
+        if (height_in_items < 0)
+            height_in_items = ImMin(items_count, 7);
+        float height_in_items_f = (float)height_in_items + 0.25f;
+        ImVec2 size(0.0f, ImTrunc(ImGui::GetTextLineHeightWithSpacing() * height_in_items_f + ImGui::GetStyle().FramePadding.y * 2.0f));
+
+        if (ImGui::BeginListBox(item.info.internalLabel.c_str(), size))
         {
-            *config.value = config.names[config.index];
-            config.disabled_value = config.names[config.index];
-            item.submitCallback(*config.value);
+            bool value_changed = false;
+            ImGuiListClipper clipper;
+            clipper.Begin(items_count, ImGui::GetTextLineHeightWithSpacing()); // We know exactly our line height here so we pass it as a minor optimization, but generally you don't need to.
+            clipper.IncludeItemByIndex(*current_item);
+            while (clipper.Step())
+            {
+                for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+                {
+                    ImGui::PushID(i);
+                    const bool item_selected = (i == *current_item);
+                    if (ImGui::Selectable(config.charNames[i], item_selected))
+                    {
+                        *current_item = i;
+                        value_changed = true;
+                    }
+                    if (item_selected)
+                        ImGui::SetItemDefaultFocus();
+                    ImGui::PopID();
+                }
+            }
+
+            item.handleDelayedScroll();
+            item.config.scrollXFlags = item.config.scrollYFlags = mvSetScrollFlags_None;
+            UpdateAppItemScrollInfo(item.state);
+
+            ImGui::EndListBox();
+
+            if (value_changed)
+            {
+                ImGuiContext& g = *GImGui;
+                ImGui::MarkItemEdited(g.LastItemData.ID);
+
+                *config.value = config.names[config.index];
+                // TODO: we need to review how listbox behaves in the disabled state.  It does
+                // not look good that it uses `index` rather than `disabledindex` here. Neither
+                // does `config.value` in `submitCallback` below.
+                config.disabled_value = config.names[config.index];
+                item.submitCallback(*config.value);
+            }
         }
 
         ImGui::PopStyleColor();

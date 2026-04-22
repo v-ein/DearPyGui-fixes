@@ -233,7 +233,7 @@ set_x_scroll(PyObject* self, PyObject* args, PyObject* kwargs)
 	else
 	{
 		mvThrowPythonError(mvErrorCode::mvIncompatibleType, "set_x_scroll",
-			"Incompatible type. Expected types include: mvWindowAppItem, mvChildWindow, mvTable", window);
+			"Incompatible type. Expected types include: mvWindowAppItem, mvChildWindow, mvTable, mvListbox", window);
 		return nullptr;
 	}
 
@@ -272,7 +272,7 @@ set_y_scroll(PyObject* self, PyObject* args, PyObject* kwargs)
 	else
 	{
 		mvThrowPythonError(mvErrorCode::mvIncompatibleType, "set_y_scroll",
-			"Incompatible type. Expected types include: mvWindowAppItem, mvChildWindow, mvTable", window);
+			"Incompatible type. Expected types include: mvWindowAppItem, mvChildWindow, mvTable, mvListbox", window);
 		return nullptr;
 	}
 
@@ -308,7 +308,7 @@ get_x_scroll(PyObject* self, PyObject* args, PyObject* kwargs)
 	else
 	{
 		mvThrowPythonError(mvErrorCode::mvIncompatibleType, "get_x_scroll",
-			"Incompatible type. Expected types include: mvWindowAppItem, mvChildWindow, mvTable", window);
+			"Incompatible type. Expected types include: mvWindowAppItem, mvChildWindow, mvTable, mvListbox", window);
 		return nullptr;
 	}
 
@@ -344,7 +344,7 @@ get_y_scroll(PyObject* self, PyObject* args, PyObject* kwargs)
 	else
 	{
 		mvThrowPythonError(mvErrorCode::mvIncompatibleType, "get_y_scroll",
-			"Incompatible type. Expected types include: mvWindowAppItem, mvChildWindow, mvTable", window);
+			"Incompatible type. Expected types include: mvWindowAppItem, mvChildWindow, mvTable, mvListbox", window);
 		return nullptr;
 	}
 
@@ -380,7 +380,7 @@ get_x_scroll_max(PyObject* self, PyObject* args, PyObject* kwargs)
 	else
 	{
 		mvThrowPythonError(mvErrorCode::mvIncompatibleType, "get_x_scroll_max",
-			"Incompatible type. Expected types include: mvWindowAppItem, mvChildWindow, mvTable", window);
+			"Incompatible type. Expected types include: mvWindowAppItem, mvChildWindow, mvTable, mvListbox", window);
 		return nullptr;
 	}
 
@@ -416,7 +416,7 @@ get_y_scroll_max(PyObject* self, PyObject* args, PyObject* kwargs)
 	else
 	{
 		mvThrowPythonError(mvErrorCode::mvIncompatibleType, "get_y_scroll_max",
-			"Incompatible type. Expected types include: mvWindowAppItem, mvChildWindow, mvTable", window);
+			"Incompatible type. Expected types include: mvWindowAppItem, mvChildWindow, mvTable, mvListbox", window);
 		return nullptr;
 	}
 
