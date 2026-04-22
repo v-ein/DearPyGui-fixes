@@ -954,7 +954,8 @@ CanItemTypeBeScrolled(mvAppItemType type)
     {
     case mvAppItemType::mvWindowAppItem:
     case mvAppItemType::mvChildWindow:
-    case mvAppItemType::mvTable: return true;
+    case mvAppItemType::mvTable:
+    case mvAppItemType::mvListbox: return true;
     default: return false;
     }
 
