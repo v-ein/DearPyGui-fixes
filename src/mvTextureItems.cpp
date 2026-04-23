@@ -218,8 +218,8 @@ void mvRawTexture::setPyValue(PyObject* value)
 			{
 				mvThrowPythonError(mvErrorCode::mvTextureNotFound, GetEntityCommand(type), "Texture data not valid", this);
 			}
+			PyBuffer_Release(&buffer_info);
 		}
-		PyBuffer_Release(&buffer_info);
 		_buffer = mvPyObject(value, true);
 	}
 }
