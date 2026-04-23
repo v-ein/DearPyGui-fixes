@@ -1135,9 +1135,8 @@ ToUCharVect(PyObject* value, const std::string& message)
             {
                 items.emplace_back((unsigned char)BufferViewer(buffer_info, i));
             }
+            PyBuffer_Release(&buffer_info);
         }
-
-        PyBuffer_Release(&buffer_info);
     }
 
     else
@@ -1188,9 +1187,8 @@ ToIntVect(PyObject* value, const std::string& message)
             {
                 items.emplace_back(BufferViewer(buffer_info, i));
             }
+            PyBuffer_Release(&buffer_info);
         }
-
-        PyBuffer_Release(&buffer_info);
     }
 
     else
@@ -1276,8 +1274,8 @@ ToFloatVect(PyObject* value, const std::string& message)
             {
                 items.emplace_back(BufferViewer(buffer_info, i));
             }
+            PyBuffer_Release(&buffer_info);
         }
-        PyBuffer_Release(&buffer_info);
     }
 
     else
@@ -1328,8 +1326,8 @@ ToDoubleVect(PyObject* value, const std::string& message)
             {
                 items.emplace_back(BufferViewer(buffer_info, i));
             }
+            PyBuffer_Release(&buffer_info);
         }
-        PyBuffer_Release(&buffer_info);
     }
 
     else
