@@ -8655,12 +8655,12 @@ def set_item_children(item, source, slot):
 
 	return internal_dpg.set_item_children(item, source, slot)
 
-def set_primary_window(window, value):
+def set_primary_window(window, value=True):
 	"""	 Sets the primary window.
 
 	Args:
 		window (Union[int, str]): 
-		value (bool): 
+		value (bool, optional): True to select this window as primary, False to make it a regular window (without any primary window). Only one window at a time can be primary.
 	Returns:
 		None
 	"""

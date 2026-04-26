@@ -9730,12 +9730,12 @@ def set_item_children(item : Union[int, str], source : Union[int, str], slot : i
 
 	return internal_dpg.set_item_children(item, source, slot, **kwargs)
 
-def set_primary_window(window : Union[int, str], value : bool, **kwargs) -> None:
+def set_primary_window(window : Union[int, str], value : bool =True, **kwargs) -> None:
 	"""	 Sets the primary window.
 
 	Args:
 		window (Union[int, str]): 
-		value (bool): 
+		value (bool, optional): True to select this window as primary, False to make it a regular window (without any primary window). Only one window at a time can be primary.
 	Returns:
 		None
 	"""

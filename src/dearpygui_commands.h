@@ -3015,7 +3015,7 @@ static PyObject*
 set_primary_window(PyObject* self, PyObject* args, PyObject* kwargs)
 {
 	PyObject* itemraw;
-	i32 value;
+	i32 value = 1;
 
 	if (!VerifyRequiredArguments(GetParsers()["set_primary_window"], args))
 		return GetPyNoneOrError();
@@ -3027,73 +3027,60 @@ set_primary_window(PyObject* self, PyObject* args, PyObject* kwargs)
 
 	mvUUID item = GetIDFromPyObject(itemraw);
 
+	mvWindowAppItem* window = GetWindow(*GContext->itemRegistry, item);
+
+	if (!window)
 	{
-		mvWindowAppItem* window = GetWindow(*GContext->itemRegistry, item);
-
-		if (!window)
-		{
-			mvThrowPythonError(mvErrorCode::mvItemNotFound, "set_primary_window",
-				"Item not found: " + std::to_string(item), nullptr);
-			assert(false);
-			return nullptr;
-		}
-		else
-		{
-			if (window->configData.mainWindow == (bool)value)
-				return GetPyNone();
-			else
-			{
-				window->configData.mainWindow = value;
-				if (value)
-				{
-					window->configData._oldWindowflags = window->configData.windowflags;
-					window->configData.windowflags = ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoSavedSettings
-						| ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;
-
-					if (window->configData._oldWindowflags & ImGuiWindowFlags_MenuBar)
-						window->configData.windowflags |= ImGuiWindowFlags_MenuBar;
-					window->configData._oldxpos = window->state.pos.x;
-					window->configData._oldypos = window->state.pos.y;
-					window->configData._oldWidth = window->config.width;
-					window->configData._oldHeight = window->config.height;
-				}
-				else
-				{
-					window->info.focusNextFrame = true;
-					if (window->configData.windowflags & ImGuiWindowFlags_MenuBar)
-						window->configData._oldWindowflags |= ImGuiWindowFlags_MenuBar;
-					window->configData.windowflags = window->configData._oldWindowflags;
-					if (window->configData.windowflags & ImGuiWindowFlags_MenuBar)
-						window->configData.windowflags |= ImGuiWindowFlags_MenuBar;
-					window->state.pos = { window->configData._oldxpos , window->configData._oldypos };
-					window->config.width = window->configData._oldWidth;
-					window->config.height = window->configData._oldHeight;
-					window->info.dirtyPos = true;
-					window->info.dirty_size = true;
-				}
-			}
-		}
+		mvThrowPythonError(mvErrorCode::mvItemNotFound, "set_primary_window",
+			"Item not found: " + std::to_string(item), nullptr);
+		assert(false);
+		return nullptr;
 	}
 
-	// reset other windows
-	for (auto& window : GContext->itemRegistry->windowRoots)
+	if (window->configData.mainWindow == (bool)value)
+		// Nothing to do!
+		return GetPyNone();
+
+	// Now, we either demote this (primary) window back to a regular window, or demote
+	// another window and set this one to be the new primary.  The `value` shows us
+	// the direction.
+	mvWindowAppItem* old_primary = nullptr;
+
+	if (value)
 	{
-		if (window->uuid != item)
+		// Find old primary, if any.  Also re-focus all windows except the current one
+		// so that they float atop of the primary window (otherwise they'd stay hidden
+		// behind it).  Unfortunately ImGui does not have better means for controlling z-order.
+		for (auto& root : GContext->itemRegistry->windowRoots)
 		{
-			mvWindowAppItem* windowActual = static_cast<mvWindowAppItem*>(window.get());
-			windowActual->configData.mainWindow = false;
-			window->info.focusNextFrame = true;
-			if (windowActual->configData.windowflags & ImGuiWindowFlags_MenuBar)
-				windowActual->configData._oldWindowflags |= ImGuiWindowFlags_MenuBar;
-			windowActual->configData.windowflags = windowActual->configData._oldWindowflags;
-			if (windowActual->configData.windowflags & ImGuiWindowFlags_MenuBar)
-				windowActual->configData.windowflags |= ImGuiWindowFlags_MenuBar;
-			window->state.pos = { windowActual->configData._oldxpos , windowActual->configData._oldypos };
-			window->config.width = windowActual->configData._oldWidth;
-			window->config.height = windowActual->configData._oldHeight;
-			window->info.dirtyPos = true;
-			window->info.dirty_size = true;
+			mvWindowAppItem* cur_window = static_cast<mvWindowAppItem*>(root.get());
+			if (cur_window->configData.mainWindow)
+				old_primary = cur_window;
+			
+			cur_window->info.focusNextFrame = (cur_window->uuid != item);
 		}
+
+		// Select the window passed in as a primary
+		window->configData.mainWindow = true;
+		window->configData._oldxpos = window->state.pos.x;
+		window->configData._oldypos = window->state.pos.y;
+		window->configData._oldWidth = window->config.width;
+		window->configData._oldHeight = window->config.height;
+	}
+	else
+		// Just demote this window, nothing special
+		old_primary = window;
+
+	// Now whatever old primary was there (it might be the window passed in -
+	// if `value` is False), we want to make it a regular window.
+	if (old_primary)
+	{
+		old_primary->configData.mainWindow = false;
+		old_primary->state.pos = { old_primary->configData._oldxpos , old_primary->configData._oldypos };
+		old_primary->config.width = old_primary->configData._oldWidth;
+		old_primary->config.height = old_primary->configData._oldHeight;
+		old_primary->info.dirtyPos = true;
+		old_primary->info.dirty_size = true;
 	}
 
 	return GetPyNone();

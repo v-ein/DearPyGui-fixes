@@ -156,7 +156,6 @@ struct mvWindowAppItemConfig
     mvVec2           min_size = { 100.0f, 100.0f };
     mvVec2           max_size = { 30000.0f, 30000.0f };
     bool             _collapsedDirty = true;
-    ImGuiWindowFlags _oldWindowflags = ImGuiWindowFlags_None;
     float            _oldxpos = 200;
     float            _oldypos = 200;
     int              _oldWidth = 200;
@@ -269,7 +268,7 @@ class mvWindowAppItem : public mvAppItem
 {
 public:
     mvWindowAppItemConfig configData{};
-    explicit mvWindowAppItem(mvUUID uuid, bool mainWindow = false) : mvAppItem(uuid) { configData.mainWindow = mainWindow; config.width = config.height = 500; info.dirty_size = true; if (mainWindow) configData.windowflags = ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;}
+    explicit mvWindowAppItem(mvUUID uuid) : mvAppItem(uuid) { config.width = config.height = 500; info.dirty_size = true; }
     void draw(ImDrawList* drawlist, float x, float y) override { DearPyGui::draw_window(drawlist, *this, configData); }
     void handleSpecificKeywordArgs(PyObject* dict) override { DearPyGui::set_configuration(dict, *this, configData); }
     void getSpecificConfiguration(PyObject* dict) override { DearPyGui::fill_configuration_dict(configData, dict); }

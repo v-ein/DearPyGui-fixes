@@ -1159,7 +1159,7 @@ def set_item_children(item : Union[int, str], source : Union[int, str], slot : i
 	"""Sets an item's children."""
 	...
 
-def set_primary_window(window : Union[int, str], value : bool) -> None:
+def set_primary_window(window : Union[int, str], value : bool ='') -> None:
 	"""Sets the primary window."""
 	...
 
