@@ -120,8 +120,10 @@ static bool SliderScalar3D(char const* pLabel, float* pValueX, float* pValueY, f
 	bool bModified = false;
 	bool hovered;
 	bool held;
-	bool pressed = ImGui::ButtonBehavior(oZDragRect, ImGui::GetID("##HandleZ"), &hovered, &held);
-	if (hovered && held)
+	ImGuiID iHandleID = ImGui::GetID("##HandleZ");
+	ImGui::KeepAliveID(iHandleID);
+	bool pressed = ImGui::ButtonBehavior(oZDragRect, iHandleID, &hovered, &held);
+	if (held)
 	{
 		if (DistToSegmentSqr(vMousePos, vDragStart, vDragEnd) < 100.0f) // 100 is arbitrary threshold
 		{
@@ -141,8 +143,10 @@ static bool SliderScalar3D(char const* pLabel, float* pValueX, float* pValueY, f
 	ImRect const oXYDrag((vRectEnd - vRectStart) * fScaleZ + vRectStart,
 		(vRectEnd - vRectStart) * fScaleZ + vRectStart + ImVec2(2.0f * fX3, 2.0f * fY3));
 	//if (ImGui::IsMouseHoveringRect(oXYDrag.Min - vSecurity, oXYDrag.Max + vSecurity) && ImGui::IsMouseDown(ImGuiMouseButton_Left))
-	pressed = ImGui::ButtonBehavior(oXYDrag, ImGui::GetID("##Zone"), &hovered, &held);
-	if (hovered && held)
+	iHandleID = ImGui::GetID("##Zone");
+	ImGui::KeepAliveID(iHandleID);
+	pressed = ImGui::ButtonBehavior(oXYDrag, iHandleID, &hovered, &held);
+	if (held)
 	{
 		ImVec2 const vLocalPos = ImGui::GetMousePos() - oXYDrag.Min;
 
@@ -220,8 +224,10 @@ static bool SliderScalar3D(char const* pLabel, float* pValueX, float* pValueY, f
 
 	//if (ImGui::IsMouseHoveringRect(vHandlePosX - ImVec2(fHandleRadius, fHandleRadius) - vSecurity, vHandlePosX + ImVec2(fHandleRadius, fHandleRadius) + vSecurity) &&
 	//	ImGui::IsMouseDown(ImGuiMouseButton_Left))
-	pressed = ImGui::ButtonBehavior(handle_x_bb, ImGui::GetID("##HandleX"), &hovered, &held);
-	if (hovered && held)
+	iHandleID = ImGui::GetID("##HandleX");
+	ImGui::KeepAliveID(iHandleID);
+	pressed = ImGui::ButtonBehavior(handle_x_bb, iHandleID, &hovered, &held);
+	if (held)
 	{
 		float const fCursorPosX = ImGui::GetMousePos().x - vStart.x;
 
@@ -231,8 +237,10 @@ static bool SliderScalar3D(char const* pLabel, float* pValueX, float* pValueY, f
 	}
 	//else if (ImGui::IsMouseHoveringRect(vHandlePosY - ImVec2(fHandleRadius, fHandleRadius) - vSecurity, vHandlePosY + ImVec2(fHandleRadius, fHandleRadius) + vSecurity) &&
 	//	ImGui::IsMouseDown(ImGuiMouseButton_Left))
-	pressed = ImGui::ButtonBehavior(handle_y_bb, ImGui::GetID("##HandleY"), &hovered, &held);
-	if (hovered && held)
+	iHandleID = ImGui::GetID("##HandleY");
+	ImGui::KeepAliveID(iHandleID);
+	pressed = ImGui::ButtonBehavior(handle_y_bb, iHandleID, &hovered, &held);
+	if (held)
 	{
 		float const fCursorPosY = ImGui::GetMousePos().y - vStart.y;
 
