@@ -3630,6 +3630,7 @@ get_item_info(PyObject* self, PyObject* args, PyObject* kwargs)
 	PyDict_SetItemString(pdict, "parent", mvPyObject(ToPyUUIDOrNone(appitem->info.parentPtr)));
 	PyDict_SetItemString(pdict, "theme", mvPyObject(ToPyUUIDOrNone(appitem->theme.get())));
 	PyDict_SetItemString(pdict, "font", mvPyObject(ToPyUUIDOrNone(appitem->font.get())));
+	PyDict_SetItemString(pdict, "handlers", mvPyObject(ToPyUUIDOrNone(appitem->handlerRegistry.get())));
 
 	if (DearPyGui::GetEntityDesciptionFlags(appitem->type) & MV_ITEM_DESC_CONTAINER)
 		PyDict_SetItemString(pdict, "container", mvPyObject(ToPyBool(true)));
