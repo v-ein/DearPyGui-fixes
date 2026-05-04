@@ -8,7 +8,7 @@ body:
         **Before opening a bug report, please:**
         - Search [existing issues](https://github.com/hoffstadt/DearPyGui/issues?q=is%3Aissue) (including closed ones) — your bug may already be known.
         - Check the [FAQ](https://github.com/hoffstadt/DearPyGui/discussions/categories/frequently-asked-questions-faq), [Wiki](https://github.com/hoffstadt/DearPyGui/wiki), and [online documentation](https://dearpygui.readthedocs.io/en/latest/index.html).
-        - **FOR FIRST-TIME USERS' ISSUES**,  please use the [Discord server](https://discord.gg/tyE7Gu4).
+        - **!!! FOR FIRST-TIME USERS' ISSUES,  please use the [Discord server](https://discord.gg/tyE7Gu4) !!!**
         - Remove all third-party libraries.
         - Confirm that the problem still exists with the **latest released version** of DearPyGui.
         - Be mindful that messages are being sent to the e-mail box of "Watching" users. Try to proof-read your messages before sending them. Edits are not seen by those users.
@@ -18,7 +18,7 @@ body:
     attributes:
       label: "Dear PyGui version:"
       description: >
-        To obtain it, run `python -c "import dearpygui; print(dearpygui.__version__)"` or `pip show dearpygui`.
+        Run `python -c "import dearpygui; print(dearpygui.__version__)"` or `pip show dearpygui` to obtain it.
       placeholder: "e.g. 2.2.1"
     validations:
       required: true
@@ -28,7 +28,7 @@ body:
     attributes:
       label: "Python version:"
       description: >
-        To obtain it, run `python --version`.
+        Run `python --version` to obtain it.
         Note: DearPyGui requires Python 3.8+.
       placeholder: "e.g. 3.11.4"
     validations:
@@ -90,7 +90,7 @@ body:
       label: "Standalone, minimal, complete and verifiable example:"
       description: |
         **Please provide the shortest self-contained Python script that recreates the issue.**
-        Strip your code down to only what is necessary to trigger the bug.<br>
+        Strip your code down to only what is necessary to trigger the bug.<br><br>
         **Anyone** should be able to **copy and paste** this code and recreate your issue.<br>
         Issues without a reproducible example may be closed.
       render: python
