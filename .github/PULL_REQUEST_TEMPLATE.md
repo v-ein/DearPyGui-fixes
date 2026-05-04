@@ -10,7 +10,7 @@
 **A checklist on final steps:**
 
 I confirm that I have:
-- [ ] listed all necessary tickets in with the "closes" keyword,
+- [ ] listed all necessary tickets with the "closes" keyword,
 - [ ] added reviewers,
 - [ ] proof-read the description in the Preview tab,
 - [ ] removed this checklist from PR description :) (yes, this checklist is for *you*, not for us - use it as a reminder).
